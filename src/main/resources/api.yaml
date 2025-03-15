@@ -27,9 +27,9 @@ components:
       type: object
       required:
         - id
-        - description
+        - name
       properties:
         id:
           type: integer
-        content:
+        name:
           type: string
