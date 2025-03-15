@@ -1,18 +1,28 @@
 package template.domain;
 
+import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import template.persistence.ItemEntity;
+import template.persistence.ItemsRepository;
 
 import java.util.List;
 
 @Service
+@AllArgsConstructor
 public class ItemsService {
 
-    public List<Item> getItems() {
-        var itemA = Item.builder().id(1).name("Item A").build();
-        var itemB = Item.builder().id(2).name("Item B").build();
-        var itemC = Item.builder().id(3).name("Item C").build();
+    private final ItemsRepository repository;
 
-        return List.of(itemA, itemB, itemC);
+    private final ModelMapper mapper = new ModelMapper();
+
+    public List<Item> getItems() {
+        return repository.findAll().stream().map(this::toDomainObject).toList();
+    }
+
+    private Item toDomainObject(ItemEntity itemEntity) {
+        return mapper.map(itemEntity, Item.class);
     }
 
 }
+
