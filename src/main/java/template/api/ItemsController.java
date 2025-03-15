@@ -1,8 +1,7 @@
 package template.api;
 
-import com.github.dozermapper.core.DozerBeanMapperBuilder;
-import com.github.dozermapper.core.Mapper;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import template.api.model.ItemDTO;
@@ -17,7 +16,7 @@ public class ItemsController implements ItemsApi {
 
     private final ItemsService service;
 
-    private final Mapper mapper = DozerBeanMapperBuilder.buildDefault();
+    private final ModelMapper mapper = new ModelMapper();
 
     @Override
     public ResponseEntity<List<ItemDTO>> getItems() {
