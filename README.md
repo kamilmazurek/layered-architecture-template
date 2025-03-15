@@ -34,24 +34,29 @@ In summary, the stack looks as follows:
 Project can be built with Apache Maven. Standard build compiles project, executes both unit and integration tests,
 and installs jar file in local repository:
 ```
-mvn clean install
+mvnw clean install
 ```
 
 Application can be deployed locally with following command:
 ```
-mvn spring-boot:run
+mvnw spring-boot:run
 ```
 
 or by running previously built jar:
 ```
-mvn clean package
+mvnw clean package
 java -jar target/layered-architecture-template-1.0.0-SNAPSHOT.jar
 ```
 
-It also comes with profile for development purposes, that contains some predefined data.
+It also comes with profile for development purposes, that can be used to start application with some predefined data.
 To start application with such profile following command can be used:
 ```
-mvn spring-boot:run -Pdev
+mvnw spring-boot:run -Pdev
+```
+
+After successful deployment predefined data can be retrieved from API, by sending GET request to this URL:
+```
+http://localhost:8080/items
 ```
 
 ## API
