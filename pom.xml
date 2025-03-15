@@ -18,6 +18,7 @@
         <jackson-databind-nullable.version>0.2.6</jackson-databind-nullable.version>
         <springdoc-openapi-ui.version>1.8.0</springdoc-openapi-ui.version>
         <openapi-generator-maven-plugin.version>7.9.0</openapi-generator-maven-plugin.version>
+        <dozer.version>7.0.0</dozer.version>
     </properties>
     <dependencies>
         <!-- spring -->
@@ -39,6 +40,17 @@
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
             <version>${springdoc-openapi-ui.version}</version>
+        </dependency>
+        <!-- util -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.dozermapper</groupId>
+            <artifactId>dozer-core</artifactId>
+            <version>${dozer.version}</version>
         </dependency>
         <!-- test -->
         <dependency>

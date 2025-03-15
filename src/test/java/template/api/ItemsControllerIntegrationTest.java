@@ -8,8 +8,7 @@ import template.api.model.ItemDTO;
 import static io.restassured.RestAssured.when;
 import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static template.api.TestItems.createTestItems;
-
+import static template.util.TestItems.createTestItemDTOs;
 
 public class ItemsControllerIntegrationTest extends AbstractIntegrationTest {
 
@@ -19,7 +18,7 @@ public class ItemsControllerIntegrationTest extends AbstractIntegrationTest {
         var response = when().get("/items");
 
         //then expected items are returned
-        assertEquals(createTestItems(), asList(response.as(ItemDTO[].class)));
+        assertEquals(createTestItemDTOs(), asList(response.as(ItemDTO[].class)));
 
         //and OK status code is returned
         assertEquals(HttpStatus.OK.value(), response.getStatusCode());
