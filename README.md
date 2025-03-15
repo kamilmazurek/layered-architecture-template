@@ -11,9 +11,9 @@ The goal was to keep it simple, clean and easy to modify.
 
 ## Stack
 
-Application is implemented in Java with Spring Boot, and uses in-memory database (H2).
-H2 seemed to me like a good choice for creating prototypes - project uses Spring Data,
-thus it is easy to change integration with H2 to other database if needed.
+Application is implemented in Java with Spring Boot, and integrates with in-memory database (H2).
+H2 seems to me a good choice for creating prototypes - however, it is easy to change the integration
+with H2 to another database if needed, since the project uses Spring Data.
 API is specified with OpenAPI, which is used to generate the interfaces and data model.
 Additionally, OpenAPI simplifies creating clients for such microservice.
 Project is covered by both unit and integration tests, and comes with Maven Failsafe Plugin
@@ -46,6 +46,13 @@ or by running previously built jar:
 ```
 mvnw clean package
 java -jar target/layered-architecture-template-1.0.0-SNAPSHOT.jar
+```
+
+The project comes with Dockerfile. To build Docker image and run it following commands can be used:
+```
+mvnw clean package
+docker build -t template/layered-architecture-template .
+docker run -p 8080:8080 template/layered-architecture-template
 ```
 
 It also comes with profile for development purposes, that can be used to start application with some predefined data.
