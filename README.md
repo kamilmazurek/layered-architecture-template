@@ -1,4 +1,4 @@
-# Layered architecture template
+# Spring Boot REST layered architecture template
 
 This repository contains an implementation of microservice with layered architecture.
 
@@ -23,33 +23,34 @@ In summary, the stack looks as follows:
 * Java 21
 * Spring Boot
 * OpenAPI
-* H2
+* H2 database
 * ModelMapper
 * JUnit
 * REST Assured
 * Apache Maven
+* Docker
 
 ## Build and deployment
 
 Project can be built with Apache Maven. Standard build compiles project, executes both unit and integration tests,
 and installs jar file in local repository:
-```
+```shell
 mvnw clean install
 ```
 
 Application can be deployed locally with following command:
-```
+```shell
 mvnw spring-boot:run
 ```
 
 or by running previously built jar:
-```
+```shell
 mvnw clean package
 java -jar target/layered-architecture-template-1.0.0-SNAPSHOT.jar
 ```
 
 The project comes with Dockerfile. To build Docker image and run it following commands can be used:
-```
+```shell
 mvnw clean package
 docker build -t template/layered-architecture-template .
 docker run -p 8080:8080 template/layered-architecture-template
@@ -57,22 +58,73 @@ docker run -p 8080:8080 template/layered-architecture-template
 
 It also comes with profile for development purposes, that can be used to start application with some predefined data.
 To start application with such profile following command can be used:
-```
+```shell
 mvnw spring-boot:run -Pdev
-```
-
-After successful deployment predefined data can be retrieved from API, by sending GET request to this URL:
-```
-http://localhost:8080/items
 ```
 
 ## API
 
-By default, application runs on port 8080. API is very simple (as it is just a template)
-and is described in api.yaml. After successful deployment items can be retrieved by sending GET
-request to this URL:
+API is described in [api.yaml](src/main/resources/api.yaml) and is very simple (as it is just a template):
+```yaml
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Items API
+  description: Template of API using items as an example
+tags:
+  - name: itemsAPI
+paths:
+  /items:
+    get:
+      operationId: getItems
+      description: Returns a list of items
+      tags:
+        - items
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ItemDTO'
+components:
+  schemas:
+    ItemDTO:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: long
+        name:
+          type: string
 ```
+
+By default, application runs on port 8080.
+After successful deployment items can be retrieved by sending GET request to this URL:
+```console
 http://localhost:8080/items
+```
+
+If application has been successfully started with predefined data (profile dev), following items should be returned:
+```json
+[
+  {
+    "id":1,
+    "name":"Item A"
+  },
+  {
+    "id":2,
+    "name":"Item B"
+  },
+  {
+    "id":3,
+    "name":"Item C"
+  }
+]
 ```
 
 ## Disclaimer
