@@ -1,6 +1,7 @@
-# Spring Boot REST layered architecture template
+# Layered architecture with Spring Boot
 
-This repository contains an implementation of microservice with layered architecture.
+This repository contains an implementation of microservice with layered architecture,
+written in Java with Spring Boot.
 
 My main motivation for creating this project is to have an implementation of microservice
 with layered architecture, which can be used as a template, so I can reduce the overhead of the
@@ -62,7 +63,7 @@ To start application with such profile following command can be used:
 mvnw spring-boot:run -Pdev
 ```
 
-## API
+## REST API
 
 API is described in [api.yaml](src/main/resources/api.yaml) and is very simple (as it is just a template):
 ```yaml
