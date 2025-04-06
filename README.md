@@ -105,12 +105,19 @@ components:
 ```
 
 By default, application runs on port 8080.
-After successful deployment items can be retrieved by sending GET request to this URL:
+After successful deployment items can be retrieved by sending GET request to the following URL:
 ```console
 http://localhost:8080/items
 ```
 
-If application has been successfully started with predefined data (profile dev), following items should be returned:
+Response should contain items from the database. If there are no items, then empty array should be returned:
+```json
+[]
+```
+
+However, if application has been started with dev profile,
+some test data should be automatically added to the database, and thus following items
+should be returned in response:
 ```json
 [
   {
