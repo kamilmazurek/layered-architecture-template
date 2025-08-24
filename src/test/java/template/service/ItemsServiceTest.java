@@ -1,6 +1,7 @@
-package template.domain;
+package template.service;
 
 import org.junit.jupiter.api.Test;
+import template.api.model.ItemDTO;
 import template.persistence.ItemEntity;
 import template.persistence.ItemsRepository;
 
@@ -9,36 +10,35 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static template.util.TestItems.createTestItemDTOs;
 import static template.util.TestItems.createTestItemEntities;
-import static template.util.TestItems.createTestItems;
-import static org.springframework.test.util.ReflectionTestUtils.invokeMethod;
 
 public class ItemsServiceTest {
 
 
     @Test
     void shouldGetItem() {
-        //given item
-        var item = ItemEntity.builder().id(1L).name("Item A").build();
+        //given entity
+        var entity = ItemEntity.builder().id(1L).name("Item A").build();
 
         //and repository
         var repository = mock(ItemsRepository.class);
-        when(repository.findById(item.getId())).thenReturn(Optional.of(item));
+        when(repository.findById(entity.getId())).thenReturn(Optional.of(entity));
 
         //and service
         var service = new ItemsService(repository);
 
         //when item is requested
-        var result = service.getItem(item.getId());
+        var result = service.getItem(entity.getId());
 
         //then expected item is returned
-        assertEquals(Optional.of(invokeMethod(service, "toDomainObject", item)), result);
+        var item = service.toDomainObject(entity);
+        assertEquals(Optional.of(service.toDTO(item)), result);
 
         //and repository was queried for data
-        verify(repository).findById(item.getId());
+        verify(repository).findById(entity.getId());
     }
 
     @Test
@@ -73,10 +73,10 @@ public class ItemsServiceTest {
         var items = service.getItems();
 
         //then items are returned
-        assertEquals(createTestItems(), items);
+        assertEquals(createTestItemDTOs(), items);
 
         //and repository was involved in retrieving the data
-        verify(repository, times(1)).findAll();
+        verify(repository).findAll();
     }
 
     @Test
@@ -88,13 +88,15 @@ public class ItemsServiceTest {
         var service = new ItemsService(repository);
 
         //and item
-        var item = Item.builder().name("Item A").build();
+        var itemDTO = new ItemDTO().name("Item A");
 
         //when item is put
-        service.putItem(1L, item);
+        service.putItem(1L, itemDTO);
 
-        //then item has been put to repository
-        verify(repository, times(1)).save(invokeMethod(service, "toEntity", item));
+        //then item has been put to repository with proper ID
+        var item = service.toDomainObject(itemDTO);
+        item.setId(1L);
+        verify(repository).save(service.toEntity(item));
     }
 
 }

@@ -3,20 +3,16 @@ package template.api;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import template.api.model.ItemDTO;
-import template.domain.Item;
-import template.domain.ItemsService;
+import template.service.ItemsService;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.util.ReflectionTestUtils.invokeMethod;
 import static template.util.TestItems.createTestItemDTOs;
-import static template.util.TestItems.createTestItems;
 
 public class ItemsControllerTest {
 
@@ -27,12 +23,10 @@ public class ItemsControllerTest {
 
         //and service
         var service = mock(ItemsService.class);
+        when(service.getItem(1L)).thenReturn(Optional.of(item));
 
         //and controller
         var controller = new ItemsController(service);
-
-        //and service contains data
-        when(service.getItem(1L)).thenReturn(Optional.of(invokeMethod(controller, "toDomainObject", item)));
 
         //when item is requested
         var response = controller.getItem(1L);
@@ -74,7 +68,7 @@ public class ItemsControllerTest {
     void shouldGetItems() {
         //given service
         var service = mock(ItemsService.class);
-        when(service.getItems()).thenReturn(createTestItems());
+        when(service.getItems()).thenReturn(createTestItemDTOs());
 
         //and controller
         var controller = new ItemsController(service);
@@ -87,14 +81,13 @@ public class ItemsControllerTest {
         assertEquals(createTestItemDTOs(), response.getBody());
 
         //and service was involved in retrieving the data
-        verify(service, times(1)).getItems();
+        verify(service).getItems();
     }
 
     @Test
     void shouldPutItem() {
         //given service
         var service = mock(ItemsService.class);
-        when(service.getItems()).thenReturn(createTestItems());
 
         //and controller
         var controller = new ItemsController(service);
@@ -109,7 +102,7 @@ public class ItemsControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
 
         //and service was involved in saving data
-        verify(service, times(1)).putItem(1L, invokeMethod(controller, "toDomainObject", item));
+        verify(service).putItem(1L, item);
     }
 
 }
