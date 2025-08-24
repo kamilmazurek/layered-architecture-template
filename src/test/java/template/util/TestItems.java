@@ -1,7 +1,7 @@
 package template.util;
 
 import template.api.model.ItemDTO;
-import template.domain.Item;
+import template.service.Item;
 import template.persistence.ItemEntity;
 
 import java.util.List;

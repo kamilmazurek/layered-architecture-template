@@ -4,17 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 import template.AbstractIntegrationTest;
 import template.api.model.ItemDTO;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
-import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static template.util.TestItems.createTestItemDTOs;
 
 public class ItemsControllerIntegrationTest extends AbstractIntegrationTest {
 
@@ -39,6 +35,7 @@ public class ItemsControllerIntegrationTest extends AbstractIntegrationTest {
                 .assertThat()
                 .body(emptyString());
     }
+
     @Test
     void shouldInsertItemByPutRequest() {
         //given item

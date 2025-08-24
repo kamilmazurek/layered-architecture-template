@@ -1,4 +1,4 @@
-package template.domain;
+package template.service;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
