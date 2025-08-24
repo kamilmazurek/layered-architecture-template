@@ -37,25 +37,32 @@ public class ItemsControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void shouldInsertItemByPutRequest() {
+    void shouldInsertItemByPutRequest() throws JsonProcessingException {
         //given item
-        var item = new ItemDTO().id(5L).name("Item D");
+        var item = new ItemDTO().id(4L).name("Item D");
 
         //when PUT request with item is sent
         given()
                 .contentType("application/json")
                 .body(item)
                 .when()
-                .put("/items/5")
+                .put("/items/4")
                 .then()
                 .statusCode(200);
 
         //then item can be retrieved by ID
-        // TODO: Once GET by ID is implemented, retrieve the item and verify it matches the previously stored one.
+        when()
+                .get("/items/4")
+                .then()
+                .statusCode(200)
+                .assertThat()
+                .body(equalTo(objectWriter.writeValueAsString(item)));
 
         //cleanup
-        // TODO: Add cleanup once DELETE by ID is implemented.
-        // TODO: Change Item id to 5 and /items/5 to /items/4
+        when()
+                .delete("/items/4")
+                .then()
+                .statusCode(200);
     }
 
     @Test
@@ -69,5 +76,47 @@ public class ItemsControllerIntegrationTest extends AbstractIntegrationTest {
                 .statusCode(400);
     }
 
+    @Test
+    void shouldDeleteItem() throws JsonProcessingException {
+        //given item
+        var item = new ItemDTO().id(4L).name("Item D");
+
+        //and item has been put
+        given()
+                .contentType("application/json")
+                .body(item)
+                .when()
+                .put("/items/4")
+                .then()
+                .statusCode(200);
+
+        //and item can be retrieved by ID
+        when()
+                .get("/items/4")
+                .then()
+                .statusCode(200)
+                .assertThat()
+                .body(equalTo(objectWriter.writeValueAsString(item)));
+
+        //when item is deleted
+        when()
+                .delete("/items/4")
+                .then()
+                .statusCode(200);
+
+        //then item can no longer be retrieved by ID
+        when()
+                .get("/items/4")
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
+    void shouldNotFindItemToDelete() {
+        when()
+                .delete("/items/4")
+                .then()
+                .statusCode(404);
+    }
 
 }

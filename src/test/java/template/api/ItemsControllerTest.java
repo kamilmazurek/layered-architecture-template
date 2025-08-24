@@ -9,7 +9,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static template.util.TestItems.createTestItemDTOs;
@@ -103,6 +105,49 @@ public class ItemsControllerTest {
 
         //and service was involved in saving data
         verify(service).putItem(1L, item);
+    }
+
+    @Test
+    void shouldDeleteItem() {
+        //given service
+        var service = mock(ItemsService.class);
+
+        //and controller
+        var controller = new ItemsController(service);
+
+        //and item
+        var item = new ItemDTO().id(1L).name("Item A");
+        when(service.getItem(item.getId())).thenReturn(Optional.of(item));
+
+        //when DELETE request is handled
+        var response = controller.deleteItem(item.getId());
+
+        //then OK status is returned
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        //and service was involved in deleting the data
+        verify(service).deleteItem(item.getId());
+    }
+
+    @Test
+    void shouldNotFindItemToDelete() {
+        //given service
+        var service = mock(ItemsService.class);
+
+        //and controller
+        var controller = new ItemsController(service);
+
+        //and item id
+        var itemId = 1L;
+
+        //when DELETE request is handled
+        var response = controller.deleteItem(itemId);
+
+        //and Not Found status is returned
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+
+        //and service was not involved in deleting the data
+        verify(service, never()).deleteItem(any());
     }
 
 }

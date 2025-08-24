@@ -17,7 +17,6 @@ import static template.util.TestItems.createTestItemEntities;
 
 public class ItemsServiceTest {
 
-
     @Test
     void shouldGetItem() {
         //given entity
@@ -97,6 +96,25 @@ public class ItemsServiceTest {
         var item = service.toDomainObject(itemDTO);
         item.setId(1L);
         verify(repository).save(service.toEntity(item));
+    }
+
+    @Test
+    void shouldDeleteItem() {
+        //given entity
+        var entity = ItemEntity.builder().id(1L).name("Item A").build();
+
+        //and repository
+        var repository = mock(ItemsRepository.class);
+        when(repository.findById(entity.getId())).thenReturn(Optional.of(entity));
+
+        //and service
+        var service = new ItemsService(repository);
+
+        //when item is deleted
+        service.deleteItem(entity.getId());
+
+        //then item is deleted from repository
+        verify(repository).deleteById(entity.getId());
     }
 
 }

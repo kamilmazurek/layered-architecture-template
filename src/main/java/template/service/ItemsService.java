@@ -33,6 +33,10 @@ public class ItemsService {
         repository.save(toEntity(item));
     }
 
+    public void deleteItem(Long id) {
+        repository.deleteById(id);
+    }
+
     @VisibleForTesting
     ItemDTO toDTO(Item item) {
         return mapper.map(item, ItemDTO.class);

@@ -47,12 +47,7 @@ paths:
       operationId: putItem
       description: Creates new item or replaces target item with the request content
       parameters:
-        - name: itemId
-          in: path
-          description: ID of an item
-          required: true
-          schema:
-            type: long
+        - $ref: '#/components/parameters/itemId'
       tags:
         - items
       requestBody:
@@ -65,6 +60,18 @@ paths:
           description: Successful response
         '400':
           description: Bad request
+    delete:
+      operationId: deleteItem
+      description: Deletes item with given ID
+      parameters:
+        - $ref: '#/components/parameters/itemId'
+      tags:
+        - items
+      responses:
+        '200':
+          description: Successful response
+        '404':
+          description: Not found
 components:
   schemas:
     ItemDTO:
@@ -77,3 +84,11 @@ components:
           type: long
         name:
           type: string
+  parameters:
+    itemId:
+      name: itemId
+      in: path
+      description: ID of an item
+      required: true
+      schema:
+        type: long
