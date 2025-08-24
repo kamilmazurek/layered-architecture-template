@@ -20,6 +20,11 @@ public class ItemsController implements ItemsApi {
     private final ModelMapper mapper = new ModelMapper();
 
     @Override
+    public ResponseEntity<ItemDTO> getItem(Long id) {
+        return service.getItem(id).map(this::toDTO).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
+
+    @Override
     public ResponseEntity<List<ItemDTO>> getItems() {
         return ResponseEntity.ok(service.getItems().stream().map(this::toDTO).toList());
     }

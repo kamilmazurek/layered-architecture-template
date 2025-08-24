@@ -8,6 +8,7 @@ import template.persistence.ItemEntity;
 import template.persistence.ItemsRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -19,6 +20,10 @@ public class ItemsService {
 
     public List<Item> getItems() {
         return repository.findAll().stream().map(this::toDomainObject).toList();
+    }
+
+    public Optional<Item> getItem(Long id) {
+        return repository.findById(id).map(this::toDomainObject);
     }
 
     public void putItem(Long itemId, Item item) {

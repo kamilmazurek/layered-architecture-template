@@ -11,6 +11,7 @@ import template.api.model.ItemDTO;
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static java.util.Arrays.asList;
+import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static template.util.TestItems.createTestItemDTOs;
@@ -20,26 +21,35 @@ public class ItemsControllerIntegrationTest extends AbstractIntegrationTest {
     private final ObjectWriter objectWriter = new ObjectMapper().writer();
 
     @Test
-    void shouldReturnItems() throws JsonProcessingException {
+    void shouldGetItem() throws JsonProcessingException {
         when()
-                .get("/items")
+                .get("/items/1")
                 .then()
                 .statusCode(200)
                 .assertThat()
-                .body(equalTo(objectWriter.writeValueAsString(createTestItemDTOs())));
+                .body(equalTo(objectWriter.writeValueAsString(new ItemDTO().id(1L).name("Item A"))));
     }
 
     @Test
+    void shouldNotFindItem() {
+        when()
+                .get("/items/4")
+                .then()
+                .statusCode(404)
+                .assertThat()
+                .body(emptyString());
+    }
+    @Test
     void shouldInsertItemByPutRequest() {
         //given item
-        var item = new ItemDTO().id(4L).name("Item D");
+        var item = new ItemDTO().id(5L).name("Item D");
 
         //when PUT request with item is sent
         given()
                 .contentType("application/json")
                 .body(item)
                 .when()
-                .put("/items/4")
+                .put("/items/5")
                 .then()
                 .statusCode(200);
 
@@ -48,6 +58,7 @@ public class ItemsControllerIntegrationTest extends AbstractIntegrationTest {
 
         //cleanup
         // TODO: Add cleanup once DELETE by ID is implemented.
+        // TODO: Change Item id to 5 and /items/5 to /items/4
     }
 
     @Test

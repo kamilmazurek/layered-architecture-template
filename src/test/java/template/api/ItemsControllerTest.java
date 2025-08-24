@@ -3,9 +3,13 @@ package template.api;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import template.api.model.ItemDTO;
+import template.domain.Item;
 import template.domain.ItemsService;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -17,7 +21,57 @@ import static template.util.TestItems.createTestItems;
 public class ItemsControllerTest {
 
     @Test
-    void shouldReturnItems() {
+    void shouldGetItem() {
+        //given item
+        var item = new ItemDTO().id(1L).name("Item A");
+
+        //and service
+        var service = mock(ItemsService.class);
+
+        //and controller
+        var controller = new ItemsController(service);
+
+        //and service contains data
+        when(service.getItem(1L)).thenReturn(Optional.of(invokeMethod(controller, "toDomainObject", item)));
+
+        //when item is requested
+        var response = controller.getItem(1L);
+
+        //then response containing expected item is returned
+        assertEquals(item, response.getBody());
+
+        //and OK status is returned
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+        //and service was involved in retrieving the data
+        verify(service).getItem(1L);
+    }
+
+    @Test
+    void shouldNotFindItem() {
+        //given service
+        var service = mock(ItemsService.class);
+        when(service.getItem(1L)).thenReturn(Optional.empty());
+
+        //and controller
+        var controller = new ItemsController(service);
+
+        //when item is requested
+        var response = controller.getItem(1L);
+
+        //then response contains no item
+        assertNull(response.getBody());
+
+        //and Not Found status is returned
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+
+        //and service was involved in retrieving the data
+        verify(service).getItem(1L);
+    }
+
+
+    @Test
+    void shouldGetItems() {
         //given service
         var service = mock(ItemsService.class);
         when(service.getItems()).thenReturn(createTestItems());
