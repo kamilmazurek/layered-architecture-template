@@ -37,6 +37,47 @@ public class ItemsControllerIntegrationTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void shouldCreateItemByPostRequest() throws JsonProcessingException {
+        //given item
+        var item = new ItemDTO().name("Item D");
+
+        //when POST request with item is sent
+        given()
+                .contentType("application/json")
+                .body(item)
+                .when()
+                .post("/items")
+                .then()
+                .statusCode(200);
+
+        //then item can be retrieved by ID
+        var expectedItem = new ItemDTO().id(4L).name("Item D");
+        when()
+                .get("/items/4")
+                .then()
+                .statusCode(200)
+                .assertThat()
+                .body(equalTo(objectWriter.writeValueAsString(expectedItem)));
+
+        //cleanup
+        when()
+                .delete("/items/4")
+                .then()
+                .statusCode(200);
+    }
+
+    @Test
+    void shouldNotAcceptPostRequestWhenItemHasID() {
+        given()
+                .contentType("application/json")
+                .body(new ItemDTO().id(4L).name("Item D"))
+                .when()
+                .post("/items")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
     void shouldInsertItemByPutRequest() throws JsonProcessingException {
         //given item
         var item = new ItemDTO().id(4L).name("Item D");

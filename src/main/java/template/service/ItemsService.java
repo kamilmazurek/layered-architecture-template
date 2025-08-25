@@ -4,7 +4,9 @@ import com.google.common.annotations.VisibleForTesting;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import template.api.model.ItemDTO;
+import template.exception.ItemIdAlreadySetException;
 import template.persistence.ItemEntity;
 import template.persistence.ItemsRepository;
 
@@ -25,6 +27,20 @@ public class ItemsService {
 
     public Optional<ItemDTO> getItem(Long id) {
         return repository.findById(id).map(this::toDomainObject).map(this::toDTO);
+    }
+
+    public void postItem(ItemDTO itemDTO) {
+        var item = toDomainObject(itemDTO);
+
+        if (item.getId() != null) {
+            throw new ItemIdAlreadySetException(item.getId());
+        }
+
+        var itemEntity = toEntity(item);
+        var maxID = repository.findMaxID();
+        itemEntity.setId(maxID + 1);
+
+        repository.save(itemEntity);
     }
 
     public void putItem(Long itemId, ItemDTO itemDTO) {
