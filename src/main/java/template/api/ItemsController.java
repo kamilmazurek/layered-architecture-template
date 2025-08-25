@@ -26,6 +26,17 @@ public class ItemsController implements ItemsApi {
     }
 
     @Override
+    public ResponseEntity<Void> postItem(ItemDTO itemDTO) {
+        if (itemDTO.getId() != null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        service.postItem(itemDTO);
+        return ResponseEntity.ok().build();
+    }
+
+
+    @Override
     public ResponseEntity<Void> putItem(Long itemId, ItemDTO itemDTO) {
         if (!hasValidId(itemId, itemDTO)) {
             return ResponseEntity.badRequest().build();

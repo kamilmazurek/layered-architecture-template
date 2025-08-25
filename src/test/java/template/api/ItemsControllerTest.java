@@ -1,7 +1,6 @@
 package template.api;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 import template.api.model.ItemDTO;
 import template.service.ItemsService;
 
@@ -14,6 +13,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.OK;
 import static template.util.TestItems.createTestItemDTOs;
 
 public class ItemsControllerTest {
@@ -37,7 +39,7 @@ public class ItemsControllerTest {
         assertEquals(item, response.getBody());
 
         //and OK status is returned
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(OK, response.getStatusCode());
 
         //and service was involved in retrieving the data
         verify(service).getItem(1L);
@@ -59,12 +61,11 @@ public class ItemsControllerTest {
         assertNull(response.getBody());
 
         //and Not Found status is returned
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(NOT_FOUND, response.getStatusCode());
 
         //and service was involved in retrieving the data
         verify(service).getItem(1L);
     }
-
 
     @Test
     void shouldGetItems() {
@@ -78,30 +79,74 @@ public class ItemsControllerTest {
         //when items are requested
         var response = controller.getItems();
 
-        //then response containing items is returned
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        //then response containing expected items is returned
         assertEquals(createTestItemDTOs(), response.getBody());
+
+        //and OK status is returned
+        assertEquals(OK, response.getStatusCode());
 
         //and service was involved in retrieving the data
         verify(service).getItems();
     }
 
     @Test
-    void shouldPutItem() {
-        //given service
+    void shouldPostItem() {
+        //given item
+        var item = new ItemDTO().name("Item A");
+
+        //and service
         var service = mock(ItemsService.class);
 
         //and controller
         var controller = new ItemsController(service);
 
-        //and item
+        //when POST request with item is handled
+        var response = controller.postItem(item);
+
+        //then OK status is returned
+        assertEquals(OK, response.getStatusCode());
+
+        //and service was involved in saving the data
+        verify(service).postItem(item);
+    }
+
+    @Test
+    void shouldNotAcceptPostRequestWhenItemHasID() {
+        //given item
+        var item = new ItemDTO().id(1L).name("Item A");
+
+        //and service
+        var service = mock(ItemsService.class);
+
+        //and controller
+        var controller = new ItemsController(service);
+
+        //when POST request with item containing ID is received
+        var response = controller.postItem(item);
+
+        //then Bad Request status is returned
+        assertEquals(BAD_REQUEST, response.getStatusCode());
+
+        //and service was not involved in saving the data
+        verify(service, never()).postItem(any());
+    }
+
+    @Test
+    void shouldPutItem() {
+        //given item
         var item = new ItemDTO().name("Item A");
+
+        //and service
+        var service = mock(ItemsService.class);
+
+        //and controller
+        var controller = new ItemsController(service);
 
         //when item is put
         var response = controller.putItem(1L, item);
 
         //then OK status is returned
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(OK, response.getStatusCode());
 
         //and service was involved in saving data
         verify(service).putItem(1L, item);
@@ -109,21 +154,21 @@ public class ItemsControllerTest {
 
     @Test
     void shouldDeleteItem() {
-        //given service
+        //given item
+        var item = new ItemDTO().id(1L).name("Item A");
+
+        //and service
         var service = mock(ItemsService.class);
+        when(service.getItem(item.getId())).thenReturn(Optional.of(item));
 
         //and controller
         var controller = new ItemsController(service);
-
-        //and item
-        var item = new ItemDTO().id(1L).name("Item A");
-        when(service.getItem(item.getId())).thenReturn(Optional.of(item));
 
         //when DELETE request is handled
         var response = controller.deleteItem(item.getId());
 
         //then OK status is returned
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(OK, response.getStatusCode());
 
         //and service was involved in deleting the data
         verify(service).deleteItem(item.getId());
@@ -143,8 +188,8 @@ public class ItemsControllerTest {
         //when DELETE request is handled
         var response = controller.deleteItem(itemId);
 
-        //and Not Found status is returned
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        //then Not Found status is returned
+        assertEquals(NOT_FOUND, response.getStatusCode());
 
         //and service was not involved in deleting the data
         verify(service, never()).deleteItem(any());
