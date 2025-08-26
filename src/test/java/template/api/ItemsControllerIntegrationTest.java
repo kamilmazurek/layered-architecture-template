@@ -12,7 +12,7 @@ import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.equalTo;
 
-public class ItemsControllerIntegrationTest extends AbstractIntegrationTest {
+class ItemsControllerIntegrationTest extends AbstractIntegrationTest {
 
     private final ObjectWriter objectWriter = new ObjectMapper().writer();
 

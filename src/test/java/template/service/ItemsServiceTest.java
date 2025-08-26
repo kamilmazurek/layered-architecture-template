@@ -19,7 +19,7 @@ import static org.mockito.Mockito.when;
 import static template.util.TestItems.createTestItemDTOs;
 import static template.util.TestItems.createTestItemEntities;
 
-public class ItemsServiceTest {
+class ItemsServiceTest {
 
     @Test
     void shouldGetItem() {
