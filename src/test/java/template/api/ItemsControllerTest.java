@@ -18,7 +18,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static template.util.TestItems.createTestItemDTOs;
 
-public class ItemsControllerTest {
+class ItemsControllerTest {
 
     @Test
     void shouldGetItem() {
