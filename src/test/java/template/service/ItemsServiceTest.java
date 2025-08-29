@@ -3,8 +3,8 @@ package template.service;
 import org.junit.jupiter.api.Test;
 import template.api.model.ItemDTO;
 import template.exception.ItemIdAlreadySetException;
-import template.persistence.ItemEntity;
-import template.persistence.ItemsRepository;
+import template.repository.ItemEntity;
+import template.repository.ItemsRepository;
 
 import java.util.Optional;
 

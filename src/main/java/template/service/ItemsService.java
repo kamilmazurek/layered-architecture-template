@@ -4,11 +4,10 @@ import com.google.common.annotations.VisibleForTesting;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import template.api.model.ItemDTO;
 import template.exception.ItemIdAlreadySetException;
-import template.persistence.ItemEntity;
-import template.persistence.ItemsRepository;
+import template.repository.ItemEntity;
+import template.repository.ItemsRepository;
 
 import java.util.List;
 import java.util.Optional;
