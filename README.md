@@ -1,3 +1,6 @@
+> This documentation is also available in an enhanced form at
+> [Layered Architecture Template](https://kamilmazurek.pl/layered-architecture-template) page.
+
 # Layered Architecture Template
 
 This repository contains the implementation of a Spring Boot microservice template that adopts the classic Layered Architecture approach. Designed with simplicity and clarity in mind, it provides a solid foundation for building Java applications that are easy to understand, extend, and maintain. The template separates concerns across common layers such as controllers, services, and repositories, and delivers a cleanly structured REST API ready for real-world use.
