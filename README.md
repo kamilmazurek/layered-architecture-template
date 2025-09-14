@@ -10,6 +10,31 @@ Core benefits:
 
 It was designed to be minimalistic, organized, and flexible to change.
 
+## Quickstart
+
+You can quickly get started with the Layered Architecture Template by following these steps:
+1. Confirm that a JDK is installed to build and run the app. Temurin, based on OpenJDK, is available at [adoptium.net](https://adoptium.net/).
+2. Obtain the source code by cloning the repository using Git, or downloading it as a ZIP archive.
+   If you downloaded the ZIP file, extract it and navigate to the `layered-architecture-template` directory.
+3. Launch the application with the development profile to preload sample data:
+    ```shell
+    mvnw spring-boot:run -Pdev
+    ```
+4. Check if the app is running by sending a GET request to the following URL. You can also paste it directly into your browser:
+    ```console
+    http://localhost:8080/items/1
+    ```
+   You should see a response containing the following item:
+    ```json
+    [
+      {
+        "id": 1,
+        "name":"Item A"
+      }
+    ]
+    ``` 
+5. Customize the code as needed, then rebuild and relaunch the project to see your changes in action 🚀.
+
 ## Table of contents
 * [Motivation](#motivation)
 * [Architecture Overview](#architecture-overview)
