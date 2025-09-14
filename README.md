@@ -555,6 +555,7 @@ It helps maintain confidence that every layer of the application behaves reliabl
 * [Layered Architecture, Baeldung](https://www.baeldung.com/cs/layered-architecture)
 * [Multitier architecture, Wikipedia](https://en.wikipedia.org/wiki/Multitier_architecture)
 * [Repository Pattern with Layered Architecture, Medium](https://medium.com/@leadcoder/repository-pattern-with-layered-architecture-35f7b9182ebf)
+* [Layered Architecture Template on LibHunt](https://www.libhunt.com/r/layered-architecture-template)
 
 ## Author
 This project was created by [Kamil Mazurek](https://kamilmazurek.pl), a Software Engineer based in Warsaw, Poland.
