@@ -1,6 +1,7 @@
 package template.service;
 
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
 import template.api.model.ItemDTO;
 import template.exception.ItemIdAlreadySetException;
 import template.repository.ItemEntity;
@@ -31,7 +32,7 @@ class ItemsServiceTest {
         when(repository.findById(entity.getId())).thenReturn(Optional.of(entity));
 
         //and service
-        var service = new ItemsService(repository);
+        var service = new ItemsService(repository, new ModelMapper());
 
         //when item is requested
         var result = service.getItem(entity.getId());
@@ -51,7 +52,7 @@ class ItemsServiceTest {
         when(repository.findById(1L)).thenReturn(Optional.empty());
 
         //and service
-        var service = new ItemsService(repository);
+        var service = new ItemsService(repository, new ModelMapper());
 
         //when item is requested
         var result = service.getItem(1L);
@@ -70,7 +71,7 @@ class ItemsServiceTest {
         when(repository.findAll()).thenReturn(createTestItemEntities());
 
         //and service
-        var service = new ItemsService(repository);
+        var service = new ItemsService(repository, new ModelMapper());
 
         //when items are requested
         var items = service.getItems();
@@ -91,7 +92,7 @@ class ItemsServiceTest {
         var repository = mock(ItemsRepository.class);
 
         //and service
-        var service = new ItemsService(repository);
+        var service = new ItemsService(repository, new ModelMapper());
 
         //when item is created
         service.postItem(dto);
@@ -112,13 +113,13 @@ class ItemsServiceTest {
         var repository = mock(ItemsRepository.class);
 
         //and service
-        var service = new ItemsService(repository);
+        var service = new ItemsService(repository, new ModelMapper());
 
         //when item is created
         var exception = assertThrows(ItemIdAlreadySetException.class, () -> service.postItem(dto));
 
         //then exception is thrown
-        var expectedMessage = "Item ID must be null when creating a new item. Expected null so the adapter can assign a new ID, but received: 1.";
+        var expectedMessage = "Item ID must be null when creating a new item. Expected null so the service can assign a new ID, but received: 1.";
         assertEquals(expectedMessage, exception.getMessage());
 
         //and item has not been saved in repository
@@ -134,7 +135,7 @@ class ItemsServiceTest {
         var repository = mock(ItemsRepository.class);
 
         //and service
-        var service = new ItemsService(repository);
+        var service = new ItemsService(repository, new ModelMapper());
 
         //when item is put
         service.putItem(1L, dto);
@@ -156,7 +157,7 @@ class ItemsServiceTest {
         when(repository.findById(entity.getId())).thenReturn(Optional.of(entity));
 
         //and service
-        var service = new ItemsService(repository);
+        var service = new ItemsService(repository, new ModelMapper());
 
         //when item is deleted
         service.deleteItem(entity.getId());
