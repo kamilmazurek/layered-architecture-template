@@ -18,7 +18,7 @@ public class ItemsService {
 
     private final ItemsRepository repository;
 
-    private final ModelMapper mapper = new ModelMapper();
+    private final ModelMapper mapper;
 
     public List<ItemDTO> getItems() {
         return repository.findAll().stream().map(this::toDomainObject).map(this::toDTO).toList();
