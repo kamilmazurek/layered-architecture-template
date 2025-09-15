@@ -442,7 +442,7 @@ http://localhost:8080/actuator/health/db
 These features help you monitor and maintain the application effectively, providing valuable insights into its health and performance across all layers of the architecture.
 Proper use of actuator endpoints can improve reliability and simplify troubleshooting in both development and production environments.
 
-> **Important:** In production environments, actuator endpoints should be secured to prevent unauthorized access. It is recommended to restrict access using authentication and authorization mechanisms. Be cautious when enabling detailed health information or sensitive endpoints.
+**Important:** In production environments, actuator endpoints should be secured to prevent unauthorized access. It is recommended to restrict access using authentication and authorization mechanisms. Be cautious when enabling detailed health information or sensitive endpoints.
 
 ## Testing Strategy
 
@@ -568,7 +568,6 @@ FOR EDUCATIONAL PURPOSES ONLY.
 
 THE SOFTWARE AND DOCUMENTATION ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
 INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-
 IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE,
 THE DOCUMENTATION, OR THE USE OR OTHER DEALINGS IN THE SOFTWARE OR DOCUMENTATION.
