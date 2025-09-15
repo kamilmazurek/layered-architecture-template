@@ -3,7 +3,7 @@
 
 # Layered Architecture Template
 
-This repository contains the implementation of a Spring Boot microservice template that adopts the classic Layered Architecture approach. Designed with simplicity and clarity in mind, it provides a solid foundation for building Java applications that are easy to understand, extend, and maintain. The template separates concerns across common layers such as controllers, services, and repositories, and delivers a cleanly structured REST API ready for real-world use.
+This repository contains a Spring Boot microservice template that follows a modern REST-based Layered Architecture approach. Designed with simplicity and clarity in mind, it provides a solid foundation for building Java applications that are easy to understand, extend, and maintain. The template separates concerns across common layers such as controllers, services, and repositories, and delivers a cleanly structured REST API ready for real-world use.
 Core benefits:
 * **Simplicity and Familiarity**: Widely adopted, this pattern is easy to understand and implement, especially for traditional enterprise teams.
 * **Separation of Responsibilities**: The architecture organizes code into layers like controller, service, and repository, each handling its role clearly.
@@ -442,7 +442,7 @@ http://localhost:8080/actuator/health/db
 These features help you monitor and maintain the application effectively, providing valuable insights into its health and performance across all layers of the architecture.
 Proper use of actuator endpoints can improve reliability and simplify troubleshooting in both development and production environments.
 
-> **Important:** In production environments, actuator endpoints should be secured to prevent unauthorized access. It is recommended to restrict access using authentication and authorization mechanisms. Be cautious when enabling detailed health information or sensitive endpoints.
+**Important:** In production environments, actuator endpoints should be secured to prevent unauthorized access. It is recommended to restrict access using authentication and authorization mechanisms. Be cautious when enabling detailed health information or sensitive endpoints.
 
 ## Testing Strategy
 
@@ -568,7 +568,6 @@ FOR EDUCATIONAL PURPOSES ONLY.
 
 THE SOFTWARE AND DOCUMENTATION ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
 INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-
 IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE,
 THE DOCUMENTATION, OR THE USE OR OTHER DEALINGS IN THE SOFTWARE OR DOCUMENTATION.
