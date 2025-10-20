@@ -9,7 +9,7 @@ Core benefits:
 * **Separation of Responsibilities**: The architecture organizes code into layers like controller, service, and repository, each handling its role clearly.
 * **Maintainability**: Encapsulation of responsibilities within layers makes the application easier to debug, extend, and refactor over time.
 * **Testability**: With clearly defined boundaries between layers, unit and integration testing become more straightforward and effective.
-* **Scalability for Common Use Cases**: Ideal for CRUD apps or moderate logic, where layers support growth without added complexity
+* **Scalability for Simple Use Cases**: Good fit for CRUD or moderate business logic apps, as layers support growth without much complexity.
 
 It was designed to be minimalistic, organized, and flexible to change.
 
