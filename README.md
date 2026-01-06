@@ -552,6 +552,7 @@ This testing setup supports the layered architecture by ensuring that each level
 It helps maintain confidence that every layer of the application behaves reliably both on its own and in coordination with others.
 
 ## Additional resources
+* [Layered Architecture Template for REST APIs with Java and Spring Boot](https://kamilmazurek.pl/layered-architecture-template)
 * [Layered Architecture, Baeldung](https://www.baeldung.com/cs/layered-architecture)
 * [Multitier architecture, Wikipedia](https://en.wikipedia.org/wiki/Multitier_architecture)
 * [Repository Pattern with Layered Architecture, Medium](https://medium.com/@leadcoder/repository-pattern-with-layered-architecture-35f7b9182ebf)
@@ -559,12 +560,18 @@ It helps maintain confidence that every layer of the application behaves reliabl
 
 ## Author
 This project was created by [Kamil Mazurek](https://kamilmazurek.pl), a Software Engineer based in Warsaw, Poland.
-You can also find me on my [LinkedIn profile](https://www.linkedin.com/in/kamil-mazurek). Thanks for visiting 🙂
+You can also find me on my [LinkedIn profile](https://www.linkedin.com/in/kamil-mazurek).
+
+More of my repositories can also be found on my GitHub and GitLab profiles:
+- [Kamil Mazurek on GitHub](https://github.com/kamilmazurek)
+- [Kamil Mazurek on GitLab](https://gitlab.com/kamilmazurek)
+
+Thanks for visiting 🙂
 
 ## Disclaimer
 
-THIS SOFTWARE AND ANY ACCOMPANYING DOCUMENTATION (INCLUDING, BUT NOT LIMITED TO, THE README.MD FILE) ARE PROVIDED
-FOR EDUCATIONAL PURPOSES ONLY.
+THIS SOFTWARE AND ANY DOCUMENTATION INCLUDED IN THIS REPOSITORY AND CREATED BY THE AUTHOR
+(INCLUDING, BUT NOT LIMITED TO, THE README.MD FILE) ARE PROVIDED FOR EDUCATIONAL PURPOSES ONLY.
 
 THE SOFTWARE AND DOCUMENTATION ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
 INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -572,5 +579,8 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMA
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE,
 THE DOCUMENTATION, OR THE USE OR OTHER DEALINGS IN THE SOFTWARE OR DOCUMENTATION.
 
-Spring Boot is a trademark of Broadcom Inc. and/or its subsidiaries.
+THIRD-PARTY LIBRARIES REFERENCED OR INCLUDED IN THIS SOFTWARE ARE SUBJECT TO THEIR OWN LICENSES.
+THIRD-PARTY DOCUMENTATION OR EXTERNAL RESOURCES REFERENCED IN THIS REPOSITORY ARE SUBJECT TO THEIR OWN LICENSES AND TERMS.
+
+Spring is a trademark of Broadcom Inc. and/or its subsidiaries. Spring Boot is a trademark of Broadcom Inc. and/or its subsidiaries.
 Oracle, Java, MySQL, and NetSuite are registered trademarks of Oracle and/or its affiliates. Other names may be trademarks of their respective owners.
