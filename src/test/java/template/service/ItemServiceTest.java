@@ -5,7 +5,7 @@ import org.modelmapper.ModelMapper;
 import template.api.model.ItemDTO;
 import template.exception.ItemIdAlreadySetException;
 import template.repository.ItemEntity;
-import template.repository.ItemsRepository;
+import template.repository.ItemRepository;
 
 import java.util.Optional;
 
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 import static template.util.TestItems.createTestItemDTOs;
 import static template.util.TestItems.createTestItemEntities;
 
-class ItemsServiceTest {
+class ItemServiceTest {
 
     @Test
     void shouldGetItem() {
@@ -28,11 +28,11 @@ class ItemsServiceTest {
         var entity = ItemEntity.builder().id(1L).name("Item A").build();
 
         //and repository
-        var repository = mock(ItemsRepository.class);
+        var repository = mock(ItemRepository.class);
         when(repository.findById(entity.getId())).thenReturn(Optional.of(entity));
 
         //and service
-        var service = new ItemsService(repository, new ModelMapper());
+        var service = new ItemService(repository, new ModelMapper());
 
         //when item is requested
         var result = service.getItem(entity.getId());
@@ -48,11 +48,11 @@ class ItemsServiceTest {
     @Test
     void shouldNotFindItem() {
         //given repository
-        var repository = mock(ItemsRepository.class);
+        var repository = mock(ItemRepository.class);
         when(repository.findById(1L)).thenReturn(Optional.empty());
 
         //and service
-        var service = new ItemsService(repository, new ModelMapper());
+        var service = new ItemService(repository, new ModelMapper());
 
         //when item is requested
         var result = service.getItem(1L);
@@ -67,11 +67,11 @@ class ItemsServiceTest {
     @Test
     void shouldGetItems() {
         //given repository
-        var repository = mock(ItemsRepository.class);
+        var repository = mock(ItemRepository.class);
         when(repository.findAll()).thenReturn(createTestItemEntities());
 
         //and service
-        var service = new ItemsService(repository, new ModelMapper());
+        var service = new ItemService(repository, new ModelMapper());
 
         //when items are requested
         var items = service.getItems();
@@ -89,10 +89,10 @@ class ItemsServiceTest {
         var dto = new ItemDTO().name("Item A");
 
         //and repository
-        var repository = mock(ItemsRepository.class);
+        var repository = mock(ItemRepository.class);
 
         //and service
-        var service = new ItemsService(repository, new ModelMapper());
+        var service = new ItemService(repository, new ModelMapper());
 
         //when item is created
         service.postItem(dto);
@@ -110,10 +110,10 @@ class ItemsServiceTest {
         var dto = new ItemDTO().name("Item A").id(1L);
 
         //and repository
-        var repository = mock(ItemsRepository.class);
+        var repository = mock(ItemRepository.class);
 
         //and service
-        var service = new ItemsService(repository, new ModelMapper());
+        var service = new ItemService(repository, new ModelMapper());
 
         //when item is created
         var exception = assertThrows(ItemIdAlreadySetException.class, () -> service.postItem(dto));
@@ -132,10 +132,10 @@ class ItemsServiceTest {
         var dto = new ItemDTO().name("Item A");
 
         //and repository
-        var repository = mock(ItemsRepository.class);
+        var repository = mock(ItemRepository.class);
 
         //and service
-        var service = new ItemsService(repository, new ModelMapper());
+        var service = new ItemService(repository, new ModelMapper());
 
         //when item is put
         service.putItem(1L, dto);
@@ -153,11 +153,11 @@ class ItemsServiceTest {
         var entity = ItemEntity.builder().id(1L).name("Item A").build();
 
         //and repository
-        var repository = mock(ItemsRepository.class);
+        var repository = mock(ItemRepository.class);
         when(repository.findById(entity.getId())).thenReturn(Optional.of(entity));
 
         //and service
-        var service = new ItemsService(repository, new ModelMapper());
+        var service = new ItemService(repository, new ModelMapper());
 
         //when item is deleted
         service.deleteItem(entity.getId());

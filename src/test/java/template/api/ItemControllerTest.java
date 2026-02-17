@@ -2,7 +2,7 @@ package template.api;
 
 import org.junit.jupiter.api.Test;
 import template.api.model.ItemDTO;
-import template.service.ItemsService;
+import template.service.ItemService;
 
 import java.util.Optional;
 
@@ -18,7 +18,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.http.HttpStatus.OK;
 import static template.util.TestItems.createTestItemDTOs;
 
-class ItemsControllerTest {
+class ItemControllerTest {
 
     @Test
     void shouldGetItem() {
@@ -26,11 +26,11 @@ class ItemsControllerTest {
         var item = new ItemDTO().id(1L).name("Item A");
 
         //and service
-        var service = mock(ItemsService.class);
+        var service = mock(ItemService.class);
         when(service.getItem(1L)).thenReturn(Optional.of(item));
 
         //and controller
-        var controller = new ItemsController(service);
+        var controller = new ItemController(service);
 
         //when item is requested
         var response = controller.getItem(1L);
@@ -48,11 +48,11 @@ class ItemsControllerTest {
     @Test
     void shouldNotFindItem() {
         //given service
-        var service = mock(ItemsService.class);
+        var service = mock(ItemService.class);
         when(service.getItem(1L)).thenReturn(Optional.empty());
 
         //and controller
-        var controller = new ItemsController(service);
+        var controller = new ItemController(service);
 
         //when item is requested
         var response = controller.getItem(1L);
@@ -70,11 +70,11 @@ class ItemsControllerTest {
     @Test
     void shouldGetItems() {
         //given service
-        var service = mock(ItemsService.class);
+        var service = mock(ItemService.class);
         when(service.getItems()).thenReturn(createTestItemDTOs());
 
         //and controller
-        var controller = new ItemsController(service);
+        var controller = new ItemController(service);
 
         //when items are requested
         var response = controller.getItems();
@@ -95,10 +95,10 @@ class ItemsControllerTest {
         var item = new ItemDTO().name("Item A");
 
         //and service
-        var service = mock(ItemsService.class);
+        var service = mock(ItemService.class);
 
         //and controller
-        var controller = new ItemsController(service);
+        var controller = new ItemController(service);
 
         //when POST request with item is handled
         var response = controller.postItem(item);
@@ -116,10 +116,10 @@ class ItemsControllerTest {
         var item = new ItemDTO().id(1L).name("Item A");
 
         //and service
-        var service = mock(ItemsService.class);
+        var service = mock(ItemService.class);
 
         //and controller
-        var controller = new ItemsController(service);
+        var controller = new ItemController(service);
 
         //when POST request with item containing ID is received
         var response = controller.postItem(item);
@@ -137,10 +137,10 @@ class ItemsControllerTest {
         var item = new ItemDTO().name("Item A");
 
         //and service
-        var service = mock(ItemsService.class);
+        var service = mock(ItemService.class);
 
         //and controller
-        var controller = new ItemsController(service);
+        var controller = new ItemController(service);
 
         //when item is put
         var response = controller.putItem(1L, item);
@@ -158,11 +158,11 @@ class ItemsControllerTest {
         var item = new ItemDTO().id(1L).name("Item A");
 
         //and service
-        var service = mock(ItemsService.class);
+        var service = mock(ItemService.class);
         when(service.getItem(item.getId())).thenReturn(Optional.of(item));
 
         //and controller
-        var controller = new ItemsController(service);
+        var controller = new ItemController(service);
 
         //when DELETE request is handled
         var response = controller.deleteItem(item.getId());
@@ -177,10 +177,10 @@ class ItemsControllerTest {
     @Test
     void shouldNotFindItemToDelete() {
         //given service
-        var service = mock(ItemsService.class);
+        var service = mock(ItemService.class);
 
         //and controller
-        var controller = new ItemsController(service);
+        var controller = new ItemController(service);
 
         //and item id
         var itemId = 1L;
