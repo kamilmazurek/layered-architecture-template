@@ -7,16 +7,16 @@ import org.springframework.stereotype.Service;
 import template.api.model.ItemDTO;
 import template.exception.ItemIdAlreadySetException;
 import template.repository.ItemEntity;
-import template.repository.ItemsRepository;
+import template.repository.ItemRepository;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class ItemsService {
+public class ItemService {
 
-    private final ItemsRepository repository;
+    private final ItemRepository repository;
 
     private final ModelMapper mapper;
 

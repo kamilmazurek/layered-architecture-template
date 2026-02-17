@@ -159,35 +159,35 @@ This implementation follows Layered Architecture principles by organizing the ap
 The key layers here are the presentation layer (controller), service layer (business logic), and data access layer (repository).
 To illustrate how these layers interact, let's walk through a typical Read use case, starting with a `GET` request handled by the controller.
 
-The `ItemsController` serves as the entry point for incoming HTTP requests. It receives the GET request, delegates processing to the service layer, and returns the appropriate HTTP response:
+The `ItemController` serves as the entry point for incoming HTTP requests. It receives the GET request, delegates processing to the service layer, and returns the appropriate HTTP response:
 
 ```java
 @RestController
 @AllArgsConstructor
-public class ItemsController implements ItemsApi {
+public class ItemController implements ItemsApi {
 
-  private final ItemsService service;
+    private final ItemService service;
 
-  @Override
-  public ResponseEntity<ItemDTO> getItem(Long id) {
-    return service.getItem(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
-  }
-    
-  (...)
+    @Override
+    public ResponseEntity<ItemDTO> getItem(Long id) {
+        return service.getItem(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
+        
+    (...)
 
 }
 ```
 
-The `ItemsService` contains the core business logic. It processes requests from the controller, applies any necessary rules or transformations, and interacts with the data access layer to fetch or modify data.
+The `ItemService` contains the core business logic. It processes requests from the controller, applies any necessary rules or transformations, and interacts with the data access layer to fetch or modify data.
 This separation keeps business rules centralized and reusable. It's also the place where more complex domain behavior or custom logic can be introduced as needed.
 Since this example only covers a simple read operation, the service currently just retrieves data from the repository, maps between the entity, domain object, and DTO, and returns it to the controller.
 
 ```java
 @Service
 @AllArgsConstructor
-public class ItemsService {
+public class ItemService {
 
-    private final ItemsRepository repository;
+    private final ItemRepository repository;
 
     private final ModelMapper mapper;
 
@@ -202,13 +202,13 @@ public class ItemsService {
 }
 ```
 
-Data persistence and retrieval are handled by the `ItemsRepository`, which communicates with the database using Spring Data's `JpaRepository`.
+Data persistence and retrieval are handled by the `ItemRepository`, which communicates with the database using Spring Data's `JpaRepository`.
 This layer abstracts database operations and keeps the service layer decoupled from storage-specific implementation details.
 For development and testing, the application uses an H2 in-memory database, which simplifies setup and allows for fast, isolated tests without the need for a full database installation.
 
 ```java
 @Repository
-public interface ItemsRepository extends JpaRepository<ItemEntity, Long> {
+public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
 
     @Query("select max(item.id) from ItemEntity item")
     Long findMaxID();
@@ -460,10 +460,10 @@ There are two main categories of tests included in this project:
 * Unit tests (`*Test.java`), which verify individual classes or methods in isolation. These run using the Maven Surefire Plugin.
 * Integration tests (`*IntegrationTest.java`), used to verify how components interact. These tests run with the Maven Failsafe Plugin.
 
-Here is a simple example of a JUnit unit test, `ItemsControllerTest`, which tests the `ItemsController` behavior.
-It uses Mockito to mock the behavior of `ItemsService`, then requests an item using the controller and validates the response:
+Here is a simple example of a JUnit unit test, `ItemControllerTest`, which tests the `ItemController` behavior.
+It uses Mockito to mock the behavior of `ItemService`, then requests an item using the controller and validates the response:
 ```java
-class ItemsControllerTest {
+class ItemControllerTest {
 
     @Test
     void shouldGetItem() {
@@ -471,11 +471,11 @@ class ItemsControllerTest {
         var item = new ItemDTO().id(1L).name("Item A");
 
         //and service
-        var service = mock(ItemsService.class);
+        var service = mock(ItemService.class);
         when(service.getItem(1L)).thenReturn(Optional.of(item));
 
         //and controller
-        var controller = new ItemsController(service);
+        var controller = new ItemController(service);
 
         //when item is requested
         var response = controller.getItem(1L);
@@ -494,10 +494,10 @@ class ItemsControllerTest {
     
 }
 ```
-Following that, here's an example of an integration test, `ItemsControllerIntegrationTest`, which verifies how multiple components work together to handle requests and responses.
+Following that, here's an example of an integration test, `ItemControllerIntegrationTest`, which verifies how multiple components work together to handle requests and responses.
 This is also a JUnit test, but this one runs with `@SpringBootTest`, so it starts an H2 database and Spring context, including controllers, database connections and more. It uses REST-assured to perform requests and validate responses, testing the actual behavior across multiple layers:
 ```java
-class ItemsControllerIntegrationTest extends AbstractIntegrationTest {
+class ItemControllerIntegrationTest extends AbstractIntegrationTest {
 
     private final ObjectWriter objectWriter = new ObjectMapper().writer();
 

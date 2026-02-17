@@ -4,16 +4,16 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import template.api.model.ItemDTO;
-import template.service.ItemsService;
+import template.service.ItemService;
 
 import java.util.List;
 import java.util.Objects;
 
 @RestController
 @AllArgsConstructor
-public class ItemsController implements ItemsApi {
+public class ItemController implements ItemsApi {
 
-    private final ItemsService service;
+    private final ItemService service;
 
     @Override
     public ResponseEntity<ItemDTO> getItem(Long id) {
