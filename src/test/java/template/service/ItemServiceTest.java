@@ -4,7 +4,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
-import template.api.model.ItemDTO;
 import template.exception.ItemIdAlreadySetException;
 import template.repository.ItemEntity;
 import template.repository.ItemRepository;
@@ -22,8 +21,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static template.util.TestItems.createTestItemDTOs;
 import static template.util.TestItems.createTestItemEntities;
+import static template.util.TestItems.createTestItems;
 
 class ItemServiceTest {
 
@@ -40,11 +39,11 @@ class ItemServiceTest {
         var service = new ItemService(mock(EntityManager.class), repository, new ModelMapper());
 
         //when item is requested
-        var result = service.getItem(entity.getId());
+        var result = service.get(entity.getId());
 
         //then expected item is returned
         var item = service.toDomainObject(entity);
-        assertEquals(Optional.of(service.toDTO(item)), result);
+        assertEquals(Optional.of(item), result);
 
         //and repository was queried for data
         verify(repository).findById(entity.getId());
@@ -60,7 +59,7 @@ class ItemServiceTest {
         var service = new ItemService(mock(EntityManager.class), repository, new ModelMapper());
 
         //when item is requested
-        var result = service.getItem(1L);
+        var result = service.get(1L);
 
         //then no items are returned
         assertTrue(result.isEmpty());
@@ -79,10 +78,10 @@ class ItemServiceTest {
         var service = new ItemService(mock(EntityManager.class), repository, new ModelMapper());
 
         //when items are requested
-        var items = service.getItems();
+        var items = service.get();
 
         //then items are returned
-        assertEquals(createTestItemDTOs(), items);
+        assertEquals(createTestItems(), items);
 
         //and repository was involved in retrieving the data
         verify(repository).findAll();
@@ -90,8 +89,8 @@ class ItemServiceTest {
 
     @Test
     void shouldCreateItem() {
-        //given DTO
-        var dto = new ItemDTO().name("Item A");
+        //given item
+        var item = Item.builder().name("Item A").build();
 
         //and repository
         var repository = mock(ItemRepository.class);
@@ -104,18 +103,17 @@ class ItemServiceTest {
         var service = new ItemService(entityManager, repository, new ModelMapper());
 
         //when item is created
-        service.postItem(dto);
+        service.create(item);
 
         //then item is saved in repository
-        var item = service.toDomainObject(dto);
         var expectedEntity = service.toEntity(item);
         verify(repository).save(expectedEntity);
     }
 
     @Test
     void shouldNotCreateItem() {
-        //given DTO
-        var dto = new ItemDTO().name("Item A").id(1L);
+        //given item
+        var item = Item.builder().id(1L).name("Item A").build();
 
         //and repository
         var repository = mock(ItemRepository.class);
@@ -124,7 +122,7 @@ class ItemServiceTest {
         var service = new ItemService(mock(EntityManager.class), repository, new ModelMapper());
 
         //when item is created
-        var exception = assertThrows(ItemIdAlreadySetException.class, () -> service.postItem(dto));
+        var exception = assertThrows(ItemIdAlreadySetException.class, () -> service.create(item));
 
         //then exception is thrown
         var expectedMessage = "Item ID must be null when creating a new item. Expected null so the service can assign a new ID, but received: 1.";
@@ -135,9 +133,9 @@ class ItemServiceTest {
     }
 
     @Test
-    void shouldPutItem() {
-        //given DTO
-        var dto = new ItemDTO().name("Item A");
+    void shouldUpsertItem() {
+        //given item
+        var item = Item.builder().id(1L).name("Item A").build();
 
         //and repository
         var repository = mock(ItemRepository.class);
@@ -162,7 +160,7 @@ class ItemServiceTest {
         var service = new ItemService(entityManager, repository, new ModelMapper());
 
         //when item is put
-        service.putItem(1L, dto);
+        service.upsert(1L, item);
 
         //then item has been saved in repository
         verify(entityManager, times(4)).createNativeQuery(anyString());
@@ -181,7 +179,7 @@ class ItemServiceTest {
         var service = new ItemService(mock(EntityManager.class), repository, new ModelMapper());
 
         //when item is deleted
-        service.deleteItem(entity.getId());
+        service.delete(entity.getId());
 
         //then item is deleted from repository
         verify(repository).deleteById(entity.getId());

@@ -16,12 +16,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "item")
+@Table(name = "ITEM")
 public class ItemEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "item_gen")
-    @SequenceGenerator(name = "item_gen", sequenceName = "item_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ITEM_GEN")
+    @SequenceGenerator(name = "ITEM_GEN", sequenceName = "ITEM_SEQ", allocationSize = 1)
     private Long id;
 
     private String name;
