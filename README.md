@@ -168,9 +168,11 @@ public class ItemController implements ItemsApi {
 
     private final ItemService service;
 
+    private final ModelMapper mapper;
+
     @Override
     public ResponseEntity<ItemDTO> getItem(Long id) {
-        return service.getItem(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return service.get(id).map(this::toDTO).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
         
     (...)
@@ -187,14 +189,15 @@ Since this example only covers a simple read operation, the service currently ju
 @AllArgsConstructor
 public class ItemService {
 
+    @PersistenceContext
+    private final EntityManager entityManager;
+
     private final ItemRepository repository;
 
     private final ModelMapper mapper;
 
-    (...)
-
-    public Optional<ItemDTO> getItem(Long id) {
-        return repository.findById(id).map(this::toDomainObject).map(this::toDTO);
+    public Optional<Item> get(Long id) {
+        return repository.findById(id).map(this::toDomainObject);
     }
     
     (...)
@@ -202,16 +205,14 @@ public class ItemService {
 }
 ```
 
-Data persistence and retrieval are handled by the `ItemRepository`, which communicates with the database using Spring Data's `JpaRepository`.
+Persistence is managed through `ItemRepository` (Spring Data `JpaRepository`), with additional database-specific operations performed via `EntityManager`.
 This layer abstracts database operations and keeps the service layer decoupled from storage-specific implementation details.
 For development and testing, the application uses an H2 in-memory database, which simplifies setup and allows for fast, isolated tests without the need for a full database installation.
 
 ```java
 @Repository
 public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
-
-    @Query("select max(item.id) from ItemEntity item")
-    Long findMaxID();
+    
 
 }
 ```
@@ -468,26 +469,26 @@ class ItemControllerTest {
     @Test
     void shouldGetItem() {
         //given item
-        var item = new ItemDTO().id(1L).name("Item A");
+        var item = Item.builder().id(1L).name("Item A").build();
 
         //and service
         var service = mock(ItemService.class);
-        when(service.getItem(1L)).thenReturn(Optional.of(item));
+        when(service.get(1L)).thenReturn(Optional.of(item));
 
         //and controller
-        var controller = new ItemController(service);
+        var controller = new ItemController(service, new ModelMapper());
 
         //when item is requested
         var response = controller.getItem(1L);
 
         //then response containing expected item is returned
-        assertEquals(item, response.getBody());
+        assertEquals(controller.toDTO(item), response.getBody());
 
         //and OK status is returned
         assertEquals(OK, response.getStatusCode());
 
         //and service was involved in retrieving the data
-        verify(service).getItem(1L);
+        verify(service).get(1L);
     }
     
     (...)
