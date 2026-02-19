@@ -205,15 +205,34 @@ public class ItemService {
 }
 ```
 
-Persistence is managed through `ItemRepository` (Spring Data `JpaRepository`), with additional database-specific operations performed via `EntityManager`.
-This layer abstracts database operations and keeps the service layer decoupled from storage-specific implementation details.
-For development and testing, the application uses an H2 in-memory database, which simplifies setup and allows for fast, isolated tests without the need for a full database installation.
+Persistence is managed through `ItemRepository`, which combines `ItemJpaRepository` with additional database-specific operations executed via `EntityManager`.
+This layer abstracts low-level database interactions and keeps the service layer decoupled from storage-specific implementation details.
+For development and testing, the application uses the H2 in-memory database, which simplifies setup and allows fast, isolated tests without requiring a separate database installation or configuration.
 
 ```java
 @Repository
-public interface ItemRepository extends JpaRepository<ItemEntity, Long> {
-    
+@AllArgsConstructor
+public class ItemRepository {
 
+    @PersistenceContext
+    private final EntityManager entityManager;
+
+    private final ItemJpaRepository jpaRepository;
+
+    public Optional<ItemEntity> findById(Long id) {
+        return jpaRepository.findById(id);
+    }
+    
+    (...)
+
+}
+```
+
+`ItemJpaRepository` relies on Spring Data JPA's `JpaRepository` and is therefore straightforward:
+```java
+@Repository
+public interface ItemJpaRepository extends JpaRepository<ItemEntity, Long> {
+    
 }
 ```
 

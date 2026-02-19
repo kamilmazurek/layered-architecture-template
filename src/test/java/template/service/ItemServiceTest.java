@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import template.exception.ItemIdAlreadySetException;
 import template.repository.ItemEntity;
+import template.repository.ItemJpaRepository;
 import template.repository.ItemRepository;
 
 import java.util.Optional;
@@ -15,10 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static template.util.TestItems.createTestItemEntities;
@@ -36,7 +35,7 @@ class ItemServiceTest {
         when(repository.findById(entity.getId())).thenReturn(Optional.of(entity));
 
         //and service
-        var service = new ItemService(mock(EntityManager.class), repository, new ModelMapper());
+        var service = new ItemService(repository, new ModelMapper());
 
         //when item is requested
         var result = service.get(entity.getId());
@@ -56,7 +55,7 @@ class ItemServiceTest {
         when(repository.findById(1L)).thenReturn(Optional.empty());
 
         //and service
-        var service = new ItemService(mock(EntityManager.class), repository, new ModelMapper());
+        var service = new ItemService(repository, new ModelMapper());
 
         //when item is requested
         var result = service.get(1L);
@@ -75,7 +74,7 @@ class ItemServiceTest {
         when(repository.findAll()).thenReturn(createTestItemEntities());
 
         //and service
-        var service = new ItemService(mock(EntityManager.class), repository, new ModelMapper());
+        var service = new ItemService(repository, new ModelMapper());
 
         //when items are requested
         var items = service.get();
@@ -95,19 +94,15 @@ class ItemServiceTest {
         //and repository
         var repository = mock(ItemRepository.class);
 
-        //and entity manager
-        var entityManager = mock(EntityManager.class);
-        when(entityManager.createNativeQuery(anyString())).thenReturn(mock(Query.class));
-
         //and service
-        var service = new ItemService(entityManager, repository, new ModelMapper());
+        var service = new ItemService(repository, new ModelMapper());
 
         //when item is created
         service.create(item);
 
         //then item is saved in repository
         var expectedEntity = service.toEntity(item);
-        verify(repository).save(expectedEntity);
+        verify(repository).create(expectedEntity);
     }
 
     @Test
@@ -119,7 +114,7 @@ class ItemServiceTest {
         var repository = mock(ItemRepository.class);
 
         //and service
-        var service = new ItemService(mock(EntityManager.class), repository, new ModelMapper());
+        var service = new ItemService(repository, new ModelMapper());
 
         //when item is created
         var exception = assertThrows(ItemIdAlreadySetException.class, () -> service.create(item));
@@ -129,7 +124,7 @@ class ItemServiceTest {
         assertEquals(expectedMessage, exception.getMessage());
 
         //and item has not been saved in repository
-        verify(repository, never()).save(any());
+        verify(repository, never()).create(any());
     }
 
     @Test
@@ -140,30 +135,14 @@ class ItemServiceTest {
         //and repository
         var repository = mock(ItemRepository.class);
 
-        //and entity manager
-        var entityManager = mock(EntityManager.class);
-        when(entityManager.createNativeQuery("SELECT 1 FROM ITEM_SEQ_LOCK FOR UPDATE")).thenReturn(mock(Query.class));
-
-        var queryA = mock(Query.class);
-        when(queryA.setParameter(eq(1), any())).thenReturn(queryA);
-        when(queryA.setParameter(eq(2), any())).thenReturn(queryA);
-        when(entityManager.createNativeQuery("MERGE INTO item (id, name) KEY(id) VALUES (?, ?)")).thenReturn(queryA);
-
-        var queryB = mock(Query.class);
-        when(queryB.getSingleResult()).thenReturn(1L);
-        var currentSeqValQueryString = "SELECT CAST(BASE_VALUE AS BIGINT) FROM INFORMATION_SCHEMA.SEQUENCES WHERE SEQUENCE_NAME = 'ITEM_SEQ'";
-        when(entityManager.createNativeQuery(currentSeqValQueryString)).thenReturn(queryB);
-
-        when(entityManager.createNativeQuery("ALTER SEQUENCE ITEM_SEQ RESTART WITH 2")).thenReturn(mock(Query.class));
-
         //and service
-        var service = new ItemService(entityManager, repository, new ModelMapper());
+        var service = new ItemService(repository, new ModelMapper());
 
         //when item is put
         service.upsert(1L, item);
 
         //then item has been saved in repository
-        verify(entityManager, times(4)).createNativeQuery(anyString());
+        verify(repository).upsert(1L, service.toEntity(item));
     }
 
     @Test
@@ -173,10 +152,9 @@ class ItemServiceTest {
 
         //and repository
         var repository = mock(ItemRepository.class);
-        when(repository.findById(entity.getId())).thenReturn(Optional.of(entity));
 
         //and service
-        var service = new ItemService(mock(EntityManager.class), repository, new ModelMapper());
+        var service = new ItemService(repository, new ModelMapper());
 
         //when item is deleted
         service.delete(entity.getId());
