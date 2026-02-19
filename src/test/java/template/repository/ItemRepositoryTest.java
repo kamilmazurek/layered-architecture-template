@@ -118,13 +118,13 @@ class ItemRepositoryTest {
         verify(lockQuery).getResultList();
 
         //and merge query is executed
-        verify(entityManager).createNativeQuery("MERGE INTO item (id, name) KEY(id) VALUES (?, ?)");
+        verify(entityManager).createNativeQuery(MERGE_QUERY);
         verify(mergeQuery).setParameter(1, entity.getId());
         verify(mergeQuery).setParameter(2, entity.getName());
 
         //and sequence query is executed
         verify(seqQuery).getSingleResult();
-        verify(entityManager).createNativeQuery(startsWith("ALTER SEQUENCE ITEM_SEQ RESTART WITH"));
+        verify(entityManager).createNativeQuery(String.format(ALTER_SEQUENCE_QUERY, entity.getId() + 1));
     }
 
     @Test
