@@ -9,6 +9,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+import static template.repository.Queries.ALTER_SEQUENCE_QUERY;
+import static template.repository.Queries.CURRENT_SEQ_VAL_QUERY;
+import static template.repository.Queries.LOCK_QUERY;
+import static template.repository.Queries.MERGE_QUERY;
+
 @Repository
 @AllArgsConstructor
 public class ItemRepository {
@@ -28,30 +33,27 @@ public class ItemRepository {
 
     @Transactional
     public void create(ItemEntity item) {
-        // Works with H2 for development and testing, but may require adjustments for production depending on the database
-        entityManager.createNativeQuery("SELECT 1 FROM ITEM_SEQ_LOCK FOR UPDATE").getResultList();
+        //Works with H2 for development and testing, but may need adjustments for production databases
+        entityManager.createNativeQuery(LOCK_QUERY).getResultList();
         jpaRepository.save(item);
     }
 
     @Transactional
     public void upsert(Long id, ItemEntity item) {
-        // Works with H2 for development and testing, but may require adjustments for production depending on the database
-        entityManager.createNativeQuery("SELECT 1 FROM ITEM_SEQ_LOCK FOR UPDATE").getResultList();
-        var mergeQuery = "MERGE INTO item (id, name) KEY(id) VALUES (?, ?)";
-        entityManager.createNativeQuery(mergeQuery).setParameter(1, id).setParameter(2, item.getName()).executeUpdate();
+        //Works with H2 for development and testing, but may need adjustments for production databases
+        entityManager.createNativeQuery(LOCK_QUERY).getResultList();
+        entityManager.createNativeQuery(MERGE_QUERY).setParameter(1, id).setParameter(2, item.getName()).executeUpdate();
         syncSequence(id);
     }
 
     private void syncSequence(Long insertedId) {
-        var currentSeqValQuery = "SELECT CAST(BASE_VALUE AS BIGINT) FROM INFORMATION_SCHEMA.SEQUENCES WHERE SEQUENCE_NAME = 'ITEM_SEQ'";
-        var currentSeqVal = (Number) entityManager.createNativeQuery(currentSeqValQuery).getSingleResult();
+        var currentSeqVal = (Number) entityManager.createNativeQuery(CURRENT_SEQ_VAL_QUERY).getSingleResult();
 
         if (insertedId < currentSeqVal.longValue()) {
             return;
         }
 
-        long newStart = insertedId + 1;
-        entityManager.createNativeQuery("ALTER SEQUENCE ITEM_SEQ RESTART WITH " + newStart).executeUpdate();
+        entityManager.createNativeQuery(String.format(ALTER_SEQUENCE_QUERY, insertedId + 1)).executeUpdate();
     }
 
     public void deleteById(Long id) {
