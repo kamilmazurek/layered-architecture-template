@@ -48,7 +48,7 @@ You can quickly get started with the Layered Architecture Template by following 
 * [REST API Overview](#rest-api-overview)
 * [Swagger and OpenAPI Endpoints](#swagger-and-openapi-endpoints)
 * [Production-ready Features](#production-ready-features)
-* [Testing Strategy](#testing-strategy)
+* [Tests](#tests)
 * [Additional Resources](#additional-resources)
 * [Author](#author)
 * [Disclaimer](#disclaimer)
@@ -188,9 +188,6 @@ Since this example only covers a simple read operation, the service currently ju
 @Service
 @AllArgsConstructor
 public class ItemService {
-
-    @PersistenceContext
-    private final EntityManager entityManager;
 
     private final ItemRepository repository;
 
@@ -464,7 +461,7 @@ Proper use of actuator endpoints can improve reliability and simplify troublesho
 
 **Important:** In production environments, actuator endpoints should be secured to prevent unauthorized access. It is recommended to restrict access using authentication and authorization mechanisms. Be cautious when enabling detailed health information or sensitive endpoints.
 
-## Testing Strategy
+## Tests
 
 This project includes a structured testing setup that combines unit tests and integration tests, helping ensure both individual components and their interactions behave as expected.
 Test execution is handled using Maven’s Surefire and Failsafe plugins, which are configured out of the box.
