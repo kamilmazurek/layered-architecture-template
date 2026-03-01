@@ -29,12 +29,10 @@ You can quickly get started with the Layered Architecture Template by following 
     ```
    You should see a response containing the following item:
     ```json
-    [
-      {
-        "id": 1,
-        "name":"Item A"
-      }
-    ]
+    {
+      "id":1,
+      "name":"Item A"
+    }
     ``` 
 5. Customize the code as needed, then rebuild and relaunch the project to see your changes in action 🚀.
 
@@ -155,11 +153,15 @@ It provides a solid foundation for building maintainable, modular, and productio
 
 ## How It Works
 
-This implementation follows Layered Architecture principles by organizing the application into distinct layers with clear responsibilities. 
-The key layers here are the presentation layer (controller), service layer (business logic), and data access layer (repository).
+This implementation follows Layered Architecture principles by organizing the application into distinct layers with clear responsibilities
+The key layers here are the presentation layer (controller), service layer (business logic), and data access layer (repository). These layers are implemented using Spring Beans.
+For a deeper understanding of what Spring Beans are, including how Spring instantiates and wires components, please see [Spring Beans Explained](https://kamilmazurek.pl/spring-beans-explained).
+
 To illustrate how these layers interact, let's walk through a typical Read use case, starting with a `GET` request handled by the controller.
 
-The `ItemController` serves as the entry point for incoming HTTP requests. It receives the GET request, delegates processing to the service layer, and returns the appropriate HTTP response:
+The API is defined using OpenAPI, which automatically generates the necessary classes, including DTOs, during the build process.
+These classes are then used by `ItemController`, a Spring-managed bean that serves as the entry point for incoming HTTP requests.
+It receives the GET request, delegates processing to the service layer, and returns the appropriate HTTP response:
 
 ```java
 @RestController
@@ -553,7 +555,7 @@ This helps ensure that the application behaves correctly across individual compo
 In addition, the project is configured to work with Allure Report, which provides a visual representation of test execution results.
 You can generate and open the report in your browser by running the following commands:
 ```console
-mvnw clean integration-test
+mvnw clean verify
 mvnw allure:serve
 ```
 The report provides a clear overview of test results, including which tests passed or failed, how long they took to run, and the overall coverage.
