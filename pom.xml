@@ -21,6 +21,7 @@
         <modelmapper.version>3.2.6</modelmapper.version>
         <allure.version>2.35.1</allure.version>
         <guava.version>33.6.0-jre</guava.version>
+        <allure.maven.plugin.version>2.18.0</allure.maven.plugin.version>
     </properties>
     <profiles>
         <profile>
@@ -180,7 +181,7 @@
             <plugin>
                 <groupId>io.qameta.allure</groupId>
                 <artifactId>allure-maven</artifactId>
-                <version>2.15.2</version>
+                <version>${allure.maven.plugin.version}</version>
                 <configuration>
                     <reportVersion>${allure.version}</reportVersion>
                 </configuration>
