@@ -33,17 +33,20 @@ public class ItemRepository {
 
     @Transactional
     public void create(ItemEntity item) {
-        //Works with H2 for development and testing, but may need adjustments for production databases
-        entityManager.createNativeQuery(LOCK_QUERY).getResultList();
+        acquireH2Lock();
         jpaRepository.save(item);
     }
 
     @Transactional
     public void upsert(Long id, ItemEntity item) {
-        //Works with H2 for development and testing, but may need adjustments for production databases
-        entityManager.createNativeQuery(LOCK_QUERY).getResultList();
+        acquireH2Lock();
         entityManager.createNativeQuery(MERGE_QUERY).setParameter(1, id).setParameter(2, item.getName()).executeUpdate();
         syncSequence(id);
+    }
+
+    private void acquireH2Lock() {
+        //solution for development and testing on H2, but it may need adjustments for production databases
+        entityManager.createNativeQuery(LOCK_QUERY).getResultList();
     }
 
     private void syncSequence(Long insertedId) {
