@@ -37,7 +37,7 @@ You can quickly get started with the Layered Architecture Template by following 
 5. Customize the code as needed, then rebuild and relaunch the project to see your changes in action 🚀.
 
 ## Table of contents
-* [Motivation](#motivation)
+* [Why this template?](#why-this-template)
 * [Architecture Overview](#architecture-overview)
 * [When to Use Layered Architecture](#when-to-use-layered-architecture)
 * [Technology Stack](#technology-stack)
@@ -51,12 +51,23 @@ You can quickly get started with the Layered Architecture Template by following 
 * [Author](#author)
 * [Disclaimer](#disclaimer)
 
-## Motivation
+## Why this template?
 
-Starting new projects often involves repetitive setup work to establish a solid codebase.
-This template aims to streamline that process by providing a clear, Layered Architecture based microservice example that can be reused and adapted quickly.
-While Maven Archetypes offer automation, the effort required to maintain a flexible archetype felt too demanding.
-Instead, this template balances simplicity and practicality to help developers get started faster.
+My main motivation for creating this project was to have a reusable implementation of a microservice based on Layered Architecture.
+Starting a new project often involves repeatedly setting up the same project structure, configuration, and tooling.
+This template reduces that overhead by providing a solid foundation for new services built with a layered approach.
+
+To accelerate development while maintaining quality standards, the template is configured with:
+* **Spring Boot 3**
+* **OpenAPI**
+* **Docker support**
+* **Integration tests**
+* **Unit tests**
+* **Allure reports**
+* **Swagger UI**
+* **Actuator endpoints**
+
+It reduces repetitive setup by providing a ready-to-use project structure, allowing developers to focus on business requirements.
 
 ## Architecture Overview
 
