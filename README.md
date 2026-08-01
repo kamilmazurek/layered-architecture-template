@@ -122,6 +122,7 @@ This clear separation simplifies development, improves maintainability, and help
 
 This approach is particularly effective for projects with well-defined and stable requirements, where a straightforward division between layers can improve team collaboration and speed up delivery.
 It works well for applications that primarily follow a request-response model, such as typical REST APIs, and where concerns like UI, service logic, and database access can be cleanly separated.
+For example, because the data access layer is isolated, your application can cleanly query a database that has been prepared and loaded by an [ETL Architecture pipeline](https://kamilmazurek.pl/etl-template-with-flink).
 For smaller or less complex projects, Layered Architecture offers a familiar and easy-to-understand structure that helps avoid unnecessary complexity.
 It also suits teams that prefer conventional architectural patterns or need quick onboarding of new developers.
 
