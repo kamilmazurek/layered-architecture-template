@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.junit.jupiter.api.Test;
-import template.AbstractIntegrationTest;
+import template.AbstractIT;
 import template.api.model.ItemDTO;
 
 import static io.restassured.RestAssured.given;
@@ -12,7 +12,7 @@ import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.emptyString;
 import static org.hamcrest.Matchers.equalTo;
 
-class ItemControllerIntegrationTest extends AbstractIntegrationTest {
+class ItemControllerIT extends AbstractIT {
 
     private final ObjectWriter objectWriter = new ObjectMapper().writer();
 

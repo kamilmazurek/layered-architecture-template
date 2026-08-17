@@ -491,7 +491,7 @@ This layered approach to testing aligns with the project's architecture and enco
 
 There are two main categories of tests included in this project:
 * Unit tests (`*Test.java`), which verify individual classes or methods in isolation. These run using the Maven Surefire Plugin.
-* Integration tests (`*IntegrationTest.java`), used to verify how components interact. These tests run with the Maven Failsafe Plugin.
+* Integration tests (`*IT.java`), used to verify how components interact. These tests run with the Maven Failsafe Plugin.
 
 Here is a simple example of a JUnit unit test, `ItemControllerTest`, which tests the `ItemController` behavior.
 It uses Mockito to mock the behavior of `ItemService`, then requests an item using the controller and validates the response:
@@ -527,10 +527,10 @@ class ItemControllerTest {
     
 }
 ```
-Following that, here's an example of an integration test, `ItemControllerIntegrationTest`, which verifies how multiple components work together to handle requests and responses.
+Following that, here's an example of an integration test, `ItemControllerIT`, which verifies how multiple components work together to handle requests and responses.
 This is also a JUnit test, but this one runs with `@SpringBootTest`, so it starts an H2 database and Spring context, including controllers, database connections and more. It uses REST-assured to perform requests and validate responses, testing the actual behavior across multiple layers:
 ```java
-class ItemControllerIntegrationTest extends AbstractIntegrationTest {
+class ItemControllerIT extends AbstractIT {
 
     private final ObjectWriter objectWriter = new ObjectMapper().writer();
 
@@ -581,7 +581,21 @@ A sample view of the generated report is shown below:
 <a href="https://allurereport.org/"><i>https://allurereport.org/</i></a>
 </p>
 
-This testing setup supports the layered architecture by ensuring that each level, from isolated service logic to fully integrated REST interactions, is thoroughly verified.
+Furthermore, to ensure high code quality, the project includes the JaCoCo Maven Plugin for code coverage analysis. 
+The configuration automatically combines the execution data from both unit and integration tests into one unified view.
+
+You can generate the coverage report by running the `verify` phase, e.g.:
+```console
+mvnw clean verify
+```
+
+Upon a successful build, the results should be waiting in the `target/site` folder. Simply open the following file in your browser:
+```
+target/site/jacoco/index.html
+```
+This gives you a clear view of which application flows are covered by your test suite and highlights any untested areas.
+
+By combining these tools, the testing setup supports the layered architecture by ensuring that each level, from isolated service logic to fully integrated REST interactions, is thoroughly verified.
 It helps maintain confidence that every layer of the application behaves reliably both on its own and in coordination with others.
 
 ## Additional resources
