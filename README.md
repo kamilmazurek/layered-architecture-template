@@ -4,6 +4,7 @@
 # Layered Architecture Template
 
 [![Build](https://github.com/kamilmazurek/layered-architecture-template/actions/workflows/build.yml/badge.svg)](https://github.com/kamilmazurek/layered-architecture-template/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/kamilmazurek/spring-beans-explained/graph/badge.svg?token=YE5HA92GHX)](https://codecov.io/gh/kamilmazurek/spring-beans-explained)
 
 This repository contains a Spring Boot microservice template that follows a modern REST-based Layered Architecture approach. Designed with simplicity and clarity in mind, it provides a solid foundation for building Java applications that are easy to understand, extend, and maintain. The template separates concerns across common layers such as controllers, services, and repositories, and delivers a cleanly structured REST API ready for real-world use.
 Core benefits:
