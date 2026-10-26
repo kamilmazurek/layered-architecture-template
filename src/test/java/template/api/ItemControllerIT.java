@@ -1,11 +1,10 @@
 package template.api;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import org.junit.jupiter.api.Test;
 import template.AbstractIT;
 import template.api.model.ItemDTO;
+import tools.jackson.databind.ObjectWriter;
+import tools.jackson.databind.json.JsonMapper;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
@@ -14,10 +13,10 @@ import static org.hamcrest.Matchers.equalTo;
 
 class ItemControllerIT extends AbstractIT {
 
-    private final ObjectWriter objectWriter = new ObjectMapper().writer();
+    private final ObjectWriter objectWriter = new JsonMapper().writer();
 
     @Test
-    void shouldGetItem() throws JsonProcessingException {
+    void shouldGetItem() {
         when()
                 .get("/items/1")
                 .then()
@@ -37,7 +36,7 @@ class ItemControllerIT extends AbstractIT {
     }
 
     @Test
-    void shouldCreateItemByPostRequest() throws JsonProcessingException {
+    void shouldCreateItemByPostRequest() {
         //given item
         var item = new ItemDTO().name("Item D");
 
@@ -78,7 +77,7 @@ class ItemControllerIT extends AbstractIT {
     }
 
     @Test
-    void shouldInsertItemByPutRequest() throws JsonProcessingException {
+    void shouldInsertItemByPutRequest() {
         //given item
         var item = new ItemDTO().id(4L).name("Item D");
 
@@ -107,7 +106,7 @@ class ItemControllerIT extends AbstractIT {
     }
 
     @Test
-    void shouldUpdateItemByPutRequest() throws JsonProcessingException {
+    void shouldUpdateItemByPutRequest() {
         //given existing item
         var item = new ItemDTO().id(4L).name("Item D");
         given()
@@ -155,7 +154,7 @@ class ItemControllerIT extends AbstractIT {
     }
 
     @Test
-    void shouldDeleteItem() throws JsonProcessingException {
+    void shouldDeleteItem() {
         //given existing item
         var item = new ItemDTO().id(4L).name("Item D");
         given()
