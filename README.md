@@ -61,7 +61,7 @@ Starting a new project often involves repeatedly setting up the same project str
 This template reduces that overhead by providing a solid foundation for new services built with a layered approach.
 
 To accelerate development while maintaining quality standards, the template is configured with:
-* **Spring Boot 3**
+* **Spring Boot 4**
 * **OpenAPI**
 * **Docker support**
 * **Integration tests**
@@ -533,10 +533,10 @@ This is also a JUnit test, but this one runs with `@SpringBootTest`, so it start
 ```java
 class ItemControllerIT extends AbstractIT {
 
-    private final ObjectWriter objectWriter = new ObjectMapper().writer();
+    private final ObjectWriter objectWriter = new JsonMapper().writer();
 
     @Test
-    void shouldGetItem() throws JsonProcessingException {
+    void shouldGetItem() {
         when()
                 .get("/items/1")
                 .then()
