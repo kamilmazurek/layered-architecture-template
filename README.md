@@ -596,6 +596,15 @@ target/site/jacoco/index.html
 ```
 This gives you a clear view of which application flows are covered by your test suite and highlights any untested areas.
 
+The project also includes a smoke test script that verifies the packaged application in its deployment forms.
+It builds the JAR file, starts the application, waits until it is healthy and sends requests to the REST API, Actuator and Swagger endpoints, checking the responses.
+Then it builds the Docker image, runs the container and repeats the same checks, additionally verifying that the container runs as a non-root user:
+```console
+./smoke-test.sh
+```
+Deployments can also be tested separately with `./smoke-test.sh jar` or `./smoke-test.sh docker`. The script requires Bash, curl and Docker (on Windows, it can be run with Git Bash).
+Smoke tests are run in the CI pipeline as well, after the build.
+
 By combining these tools, the testing setup supports the layered architecture by ensuring that each level, from isolated service logic to fully integrated REST interactions, is thoroughly verified.
 It helps maintain confidence that every layer of the application behaves reliably both on its own and in coordination with others.
 
