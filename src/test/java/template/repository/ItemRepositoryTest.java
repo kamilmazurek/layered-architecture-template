@@ -1,23 +1,19 @@
 package template.repository;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
+import template.exception.ItemAlreadyExistsException;
 
-import java.util.List;
+import java.sql.SQLException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyInt;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.startsWith;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static template.repository.Queries.ALTER_SEQUENCE_QUERY;
-import static template.repository.Queries.CURRENT_SEQ_VAL_QUERY;
-import static template.repository.Queries.LOCK_QUERY;
-import static template.repository.Queries.MERGE_QUERY;
 import static template.util.TestItems.createTestItemEntities;
 
 class ItemRepositoryTest {
@@ -25,23 +21,23 @@ class ItemRepositoryTest {
     @Test
     void shouldFindItemById() {
         //given entity
-        var entity = ItemEntity.builder().id(1L).name("Item A").build();
+        var entity = ItemEntity.builder().id("item-a").name("Item A").build();
 
         //and JPA repository
         var jpaRepository = mock(ItemJpaRepository.class);
-        when(jpaRepository.findById(1L)).thenReturn(Optional.of(entity));
+        when(jpaRepository.findById("item-a")).thenReturn(Optional.of(entity));
 
         //and repository
         var repository = new ItemRepository(mock(EntityManager.class), jpaRepository);
 
         //when item is requested
-        var result = repository.findById(1L);
+        var result = repository.findById("item-a");
 
         //then expected item is returned
         assertEquals(Optional.of(entity), result);
 
         //and repository was queried for data
-        verify(jpaRepository).findById(1L);
+        verify(jpaRepository).findById("item-a");
     }
 
     @Test
@@ -69,62 +65,58 @@ class ItemRepositoryTest {
     @Test
     void shouldCreateItem() {
         //given entity
-        var entity = ItemEntity.builder().name("Item A").build();
-
-        //and JPA repository
-        var jpaRepository = mock(ItemJpaRepository.class);
+        var entity = ItemEntity.builder().id("item-a").name("Item A").build();
 
         //and entity manager
         var entityManager = mock(EntityManager.class);
-        var lockQuery = createLockQuery(entityManager);
 
         //and repository
-        var repository = new ItemRepository(entityManager, jpaRepository);
+        var repository = new ItemRepository(entityManager, mock(ItemJpaRepository.class));
 
         //when item is created
         repository.create(entity);
 
-        //then lock query is executed
-        verify(entityManager).createNativeQuery(LOCK_QUERY);
-        verify(lockQuery).getResultList();
+        //then item is persisted and flushed
+        verify(entityManager).persist(entity);
+        verify(entityManager).flush();
+    }
 
-        //and item is saved in repository
-        verify(jpaRepository).save(entity);
+    @Test
+    void shouldNotCreateItemWhenIdAlreadyExists() {
+        //given entity
+        var entity = ItemEntity.builder().id("item-a").name("Item A").build();
+
+        //and entity manager that reports primary key violation
+        var entityManager = mock(EntityManager.class);
+        doThrow(new ConstraintViolationException("Duplicate key", new SQLException(), "PRIMARY_KEY"))
+                .when(entityManager).flush();
+
+        //and repository
+        var repository = new ItemRepository(entityManager, mock(ItemJpaRepository.class));
+
+        //when item is created
+        var exception = assertThrows(ItemAlreadyExistsException.class, () -> repository.create(entity));
+
+        //then exception with item ID is thrown
+        assertEquals("Item with id item-a already exists", exception.getMessage());
     }
 
     @Test
     void shouldUpsertItem() {
         //given entity
-        var entity = ItemEntity.builder().id(1L).name("Item A").build();
+        var entity = ItemEntity.builder().id("item-a").name("Item A").build();
 
         //and JPA repository
         var jpaRepository = mock(ItemJpaRepository.class);
 
-        //and entity manager with helper methods for queries
-        var entityManager = mock(EntityManager.class);
-        var lockQuery = createLockQuery(entityManager);
-        var mergeQuery = createMergeQuery(entityManager);
-        var seqQuery = createSequenceQuery(entityManager);
-        createAlterSequenceQuery(entityManager, 2L);
-
         //and repository
-        var repository = new ItemRepository(entityManager, jpaRepository);
+        var repository = new ItemRepository(mock(EntityManager.class), jpaRepository);
 
         //when item is upserted
-        repository.upsert(entity.getId(), entity);
+        repository.upsert(entity);
 
-        //then lock query is executed
-        verify(entityManager).createNativeQuery(LOCK_QUERY);
-        verify(lockQuery).getResultList();
-
-        //and merge query is executed
-        verify(entityManager).createNativeQuery(MERGE_QUERY);
-        verify(mergeQuery).setParameter(1, entity.getId());
-        verify(mergeQuery).setParameter(2, entity.getName());
-
-        //and sequence query is executed
-        verify(seqQuery).getSingleResult();
-        verify(entityManager).createNativeQuery(String.format(ALTER_SEQUENCE_QUERY, entity.getId() + 1));
+        //then item is saved in JPA repository
+        verify(jpaRepository).save(entity);
     }
 
     @Test
@@ -135,36 +127,10 @@ class ItemRepositoryTest {
         var repository = new ItemRepository(mock(EntityManager.class), jpaRepository);
 
         //when item is deleted
-        repository.deleteById(1L);
+        repository.deleteById("item-a");
 
         //then item is deleted from JPA repository
-        verify(jpaRepository).deleteById(1L);
-    }
-
-    private Query createLockQuery(EntityManager em) {
-        var query = mock(Query.class);
-        when(em.createNativeQuery(LOCK_QUERY)).thenReturn(query);
-        when(query.getResultList()).thenReturn(List.of(1));
-        return query;
-    }
-
-    private Query createMergeQuery(EntityManager em) {
-        var query = mock(Query.class);
-        when(em.createNativeQuery(MERGE_QUERY)).thenReturn(query);
-        when(query.setParameter(anyInt(), any())).thenReturn(query);
-        return query;
-    }
-
-    private Query createSequenceQuery(EntityManager em) {
-        var query = mock(Query.class);
-        when(em.createNativeQuery(CURRENT_SEQ_VAL_QUERY)).thenReturn(query);
-        when(query.getSingleResult()).thenReturn(0L);
-        return query;
-    }
-
-    private void createAlterSequenceQuery(EntityManager em, Long id) {
-        var query = mock(Query.class);
-        when(em.createNativeQuery(String.format(ALTER_SEQUENCE_QUERY, id))).thenReturn(query);
+        verify(jpaRepository).deleteById("item-a");
     }
 
 }

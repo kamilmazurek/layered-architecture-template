@@ -28,12 +28,12 @@ You can quickly get started with the Layered Architecture Template by following 
     ```
 4. Check if the app is running by sending a GET request to the following URL. You can also paste it directly into your browser:
     ```console
-    http://localhost:8080/items/1
+    http://localhost:8080/items/item-a
     ```
    You should see a response containing the following item:
     ```json
     {
-      "id":1,
+      "id":"item-a",
       "name":"Item A"
     }
     ``` 
@@ -188,8 +188,8 @@ public class ItemController implements ItemsApi {
     private final ModelMapper mapper;
 
     @Override
-    public ResponseEntity<ItemDTO> getItem(Long id) {
-        return service.get(id).map(this::toDTO).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<ItemDTO> getItem(String id) {
+        return findItem(id).map(this::toDTO).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
         
     (...)
@@ -210,8 +210,8 @@ public class ItemService {
 
     private final ModelMapper mapper;
 
-    public Optional<Item> get(Long id) {
-        return repository.findById(id).map(this::toDomainObject);
+    public Optional<Item> get(ItemId id) {
+        return repository.findById(id.value()).map(this::toDomainObject);
     }
     
     (...)
@@ -233,7 +233,7 @@ public class ItemRepository {
 
     private final ItemJpaRepository jpaRepository;
 
-    public Optional<ItemEntity> findById(Long id) {
+    public Optional<ItemEntity> findById(String id) {
         return jpaRepository.findById(id);
     }
     
@@ -245,7 +245,7 @@ public class ItemRepository {
 `ItemJpaRepository` relies on Spring Data JPA's `JpaRepository` and is therefore straightforward:
 ```java
 @Repository
-public interface ItemJpaRepository extends JpaRepository<ItemEntity, Long> {
+public interface ItemJpaRepository extends JpaRepository<ItemEntity, String> {
     
 }
 ```
@@ -318,18 +318,18 @@ The response will contain all items currently stored in the database. If no item
 []
 ```
 
-New items can be added to the database using the `POST` method. For example, the following curl command can be used on Linux to create an item named "Item A":
+New items can be added to the database using the `POST` method. The item ID is derived from its name, e.g., "Item A" gets ID `item-a`. For example, the following curl command can be used on Linux to create an item named "Item A":
 ```console
 curl -i -X POST http://localhost:8080/items \
   -H "Content-Type: application/json" \
   -d '{"name":"Item A"}'
 ```
 
-Items can also be added or updated using the `PUT` method. For example, the following curl command adds or updates an item with the ID `1`:
+Alternatively, you can create or update an item using a `PUT` request, as long as the ID in the URL matches the ID generated from the item's name:
 ```console
-curl -i -X PUT http://localhost:8080/items/1 \
+curl -i -X PUT http://localhost:8080/items/item-a \
   -H "Content-Type: application/json" \
-  -d '{"id":1, "name":"Item A"}'
+  -d '{"id":"item-a", "name":"Item A"}'
 ```
 
 After adding the item, you can verify it by retrieving the list of items. A `GET` request  to `/items` should now return the newly added entry:
@@ -339,19 +339,19 @@ http://localhost:8080/items
 ```json
 [
   {
-    "id": 1,
+    "id": "item-a",
     "name":"Item A"
   }
 ]
 ```  
 
-You can also fetch a specific item by its ID using the `/items/{id}` endpoint. For example, sending `GET /items/1` request:
+You can also fetch a specific item by its ID using the `/items/{id}` endpoint. For example, sending `GET /items/item-a` request:
 ```console
-http://localhost:8080/items/1
+http://localhost:8080/items/item-a
 ```
 ```json
 {
-  "id": 1,
+  "id": "item-a",
   "name":"Item A"
 }
 ```
@@ -364,25 +364,25 @@ http://localhost:8080/items
 ```json
 [
   {
-    "id":1,
+    "id":"item-a",
     "name":"Item A"
   },
   {
-    "id":2,
+    "id":"item-b",
     "name":"Item B"
   },
   {
-    "id":3,
+    "id":"item-c",
     "name":"Item C"
   }
 ]
 ```
 
 Items can be removed from the database using the `DELETE` method.
-For instance, to delete the item with ID `1`, you can execute the following curl command on a Linux terminal.
+For instance, to delete the item with ID `item-a`, you can execute the following curl command on a Linux terminal.
 This will send a request to the server to remove the specified item:
 ```console
-curl -i -X DELETE http://localhost:8080/items/1
+curl -i -X DELETE http://localhost:8080/items/item-a
 ```
 
 As another option, you can perform all these operations such as GET, POST, PUT and DELETE through the Swagger user interface.
@@ -502,17 +502,17 @@ class ItemControllerTest {
     @Test
     void shouldGetItem() {
         //given item
-        var item = Item.builder().id(1L).name("Item A").build();
+        var item = Item.builder().id(new ItemId("item-a")).name("Item A").build();
 
         //and service
         var service = mock(ItemService.class);
-        when(service.get(1L)).thenReturn(Optional.of(item));
+        when(service.get(new ItemId("item-a"))).thenReturn(Optional.of(item));
 
         //and controller
-        var controller = new ItemController(service, new ModelMapper());
+        var controller = new ItemController(service, new TemplateConfig().modelMapper());
 
         //when item is requested
-        var response = controller.getItem(1L);
+        var response = controller.getItem("item-a");
 
         //then response containing expected item is returned
         assertEquals(controller.toDTO(item), response.getBody());
@@ -521,7 +521,7 @@ class ItemControllerTest {
         assertEquals(OK, response.getStatusCode());
 
         //and service was involved in retrieving the data
-        verify(service).get(1L);
+        verify(service).get(new ItemId("item-a"));
     }
     
     (...)
@@ -538,11 +538,11 @@ class ItemControllerIT extends AbstractIT {
     @Test
     void shouldGetItem() {
         when()
-                .get("/items/1")
+                .get("/items/item-a")
                 .then()
                 .statusCode(200)
                 .assertThat()
-                .body(equalTo(objectWriter.writeValueAsString(new ItemDTO().id(1L).name("Item A"))));
+                .body(equalTo(objectWriter.writeValueAsString(new ItemDTO().id("item-a").name("Item A"))));
     }
     
     (...)

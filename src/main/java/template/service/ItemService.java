@@ -6,8 +6,10 @@ import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import template.exception.ItemIdAlreadySetException;
+import template.exception.ItemIdMismatchException;
 import template.repository.ItemEntity;
 import template.repository.ItemRepository;
+import template.service.util.ItemIdGenerator;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,8 +22,8 @@ public class ItemService {
 
     private final ModelMapper mapper;
 
-    public Optional<Item> get(Long id) {
-        return repository.findById(id).map(this::toDomainObject);
+    public Optional<Item> get(ItemId id) {
+        return repository.findById(id.value()).map(this::toDomainObject);
     }
 
     public List<Item> get() {
@@ -33,16 +35,23 @@ public class ItemService {
         if (item.getId() != null) {
             throw new ItemIdAlreadySetException(item.getId());
         }
-        repository.create(toEntity(item));
+
+        repository.create(toEntity(item.toBuilder().id(ItemIdGenerator.fromName(item.getName())).build()));
     }
 
     @Transactional
-    public void upsert(Long itemId, Item item) {
-        repository.upsert(itemId, toEntity(item));
+    public void upsert(Item item) {
+        var expectedId = ItemIdGenerator.fromName(item.getName());
+
+        if (!expectedId.equals(item.getId())) {
+            throw new ItemIdMismatchException(expectedId, item.getId());
+        }
+
+        repository.upsert(toEntity(item));
     }
 
-    public void delete(Long id) {
-        repository.deleteById(id);
+    public void delete(ItemId id) {
+        repository.deleteById(id.value());
     }
 
     @VisibleForTesting
@@ -56,4 +65,3 @@ public class ItemService {
     }
 
 }
-
