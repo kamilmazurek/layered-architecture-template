@@ -1,15 +1,20 @@
 package template.api;
 
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
+import org.modelmapper.MappingException;
 import template.api.model.ItemDTO;
+import template.config.TemplateConfig;
+import template.exception.InvalidItemIdException;
 import template.service.Item;
+import template.service.ItemId;
 import template.service.ItemService;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -26,17 +31,17 @@ class ItemControllerTest {
     @Test
     void shouldGetItem() {
         //given item
-        var item = Item.builder().id(1L).name("Item A").build();
+        var item = Item.builder().id(new ItemId("item-a")).name("Item A").build();
 
         //and service
         var service = mock(ItemService.class);
-        when(service.get(1L)).thenReturn(Optional.of(item));
+        when(service.get(new ItemId("item-a"))).thenReturn(Optional.of(item));
 
         //and controller
-        var controller = new ItemController(service, new ModelMapper());
+        var controller = new ItemController(service, new TemplateConfig().modelMapper());
 
         //when item is requested
-        var response = controller.getItem(1L);
+        var response = controller.getItem("item-a");
 
         //then response containing expected item is returned
         assertEquals(controller.toDTO(item), response.getBody());
@@ -45,20 +50,20 @@ class ItemControllerTest {
         assertEquals(OK, response.getStatusCode());
 
         //and service was involved in retrieving the data
-        verify(service).get(1L);
+        verify(service).get(new ItemId("item-a"));
     }
 
     @Test
     void shouldNotFindItem() {
         //given service
         var service = mock(ItemService.class);
-        when(service.get(1L)).thenReturn(Optional.empty());
+        when(service.get(new ItemId("item-a"))).thenReturn(Optional.empty());
 
         //and controller
-        var controller = new ItemController(service, new ModelMapper());
+        var controller = new ItemController(service, new TemplateConfig().modelMapper());
 
         //when item is requested
-        var response = controller.getItem(1L);
+        var response = controller.getItem("item-a");
 
         //then response contains no item
         assertNull(response.getBody());
@@ -67,7 +72,25 @@ class ItemControllerTest {
         assertEquals(NOT_FOUND, response.getStatusCode());
 
         //and service was involved in retrieving the data
-        verify(service).get(1L);
+        verify(service).get(new ItemId("item-a"));
+    }
+
+    @Test
+    void shouldNotFindItemWithInvalidId() {
+        //given service
+        var service = mock(ItemService.class);
+
+        //and controller
+        var controller = new ItemController(service, new TemplateConfig().modelMapper());
+
+        //when item with invalid ID is requested
+        var response = controller.getItem("Item A");
+
+        //then Not Found status is returned
+        assertEquals(NOT_FOUND, response.getStatusCode());
+
+        //and service was not involved in retrieving the data
+        verify(service, never()).get(any());
     }
 
     @Test
@@ -77,7 +100,7 @@ class ItemControllerTest {
         when(service.get()).thenReturn(createTestItems());
 
         //and controller
-        var controller = new ItemController(service, new ModelMapper());
+        var controller = new ItemController(service, new TemplateConfig().modelMapper());
 
         //when items are requested
         var response = controller.getItems();
@@ -101,7 +124,7 @@ class ItemControllerTest {
         var service = mock(ItemService.class);
 
         //and controller
-        var controller = new ItemController(service, new ModelMapper());
+        var controller = new ItemController(service, new TemplateConfig().modelMapper());
 
         //when POST request with item is handled
         var response = controller.postItem(item);
@@ -116,13 +139,13 @@ class ItemControllerTest {
     @Test
     void shouldNotAcceptPostRequestWhenItemHasID() {
         //given item
-        var item = new ItemDTO().id(1L).name("Item A");
+        var item = new ItemDTO().id("item-a").name("Item A");
 
         //and service
         var service = mock(ItemService.class);
 
         //and controller
-        var controller = new ItemController(service, new ModelMapper());
+        var controller = new ItemController(service, new TemplateConfig().modelMapper());
 
         //when POST request with item containing ID is received
         var response = controller.postItem(item);
@@ -137,38 +160,101 @@ class ItemControllerTest {
     @Test
     void shouldPutItem() {
         //given item
-        var item = new ItemDTO().name("Item A");
+        var item = new ItemDTO().id("item-a").name("Item A");
 
         //and service
         var service = mock(ItemService.class);
 
         //and controller
-        var controller = new ItemController(service, new ModelMapper());
+        var controller = new ItemController(service, new TemplateConfig().modelMapper());
 
         //when item is put
-        var response = controller.putItem(1L, item);
+        var response = controller.putItem("item-a", item);
 
         //then OK status is returned
         assertEquals(OK, response.getStatusCode());
 
         //and service was involved in saving data
-        verify(service).upsert(1L, controller.toDomainObject(item));
+        verify(service).upsert(controller.toDomainObject(item));
+    }
+
+    @Test
+    void shouldNotAcceptPutRequestWhenItemHasNoID() {
+        //given item
+        var item = new ItemDTO().name("Item A"); // ID is null
+
+        //and service
+        var service = mock(ItemService.class);
+
+        //and controller
+        var controller = new ItemController(service, new TemplateConfig().modelMapper());
+
+        //when PUT request is received but DTO lacks an ID
+        var response = controller.putItem("item-a", item);
+
+        //then Bad Request status is returned
+        assertEquals(BAD_REQUEST, response.getStatusCode());
+
+        //and service was not involved in saving the data
+        verify(service, never()).upsert(any());
+    }
+
+    @Test
+    void shouldNotAcceptPutRequestWhenItemHasAmbiguousID() {
+        //given item
+        var item = new ItemDTO().id("item-a").name("Item A");
+
+        //and service
+        var service = mock(ItemService.class);
+
+        //and controller
+        var controller = new ItemController(service, new TemplateConfig().modelMapper());
+
+        //when PUT request with ambiguous ID is received
+        var response = controller.putItem("item-b", item);
+
+        //then Bad Request status is returned
+        assertEquals(BAD_REQUEST, response.getStatusCode());
+
+        //and service was not involved in saving the data
+        verify(service, never()).upsert(any());
+    }
+
+    @Test
+    void shouldNotPutItemWithInvalidId() {
+        //given item with invalid ID
+        var item = new ItemDTO().id("Item A").name("Item A");
+
+        //and service
+        var service = mock(ItemService.class);
+
+        //and controller
+        var controller = new ItemController(service, new TemplateConfig().modelMapper());
+
+        //when PUT request with invalid ID is received
+        var exception = assertThrows(MappingException.class, () -> controller.putItem("Item A", item));
+
+        //then exception is caused by invalid ID
+        assertInstanceOf(InvalidItemIdException.class, exception.getCause());
+
+        //and service was not involved in saving the data
+        verify(service, never()).upsert(any());
     }
 
     @Test
     void shouldDeleteItem() {
         //given item
-        var item = Item.builder().id(1L).name("Item A").build();
+        var item = Item.builder().id(new ItemId("item-a")).name("Item A").build();
 
         //and service
         var service = mock(ItemService.class);
         when(service.get(item.getId())).thenReturn(Optional.of(item));
 
         //and controller
-        var controller = new ItemController(service, new ModelMapper());
+        var controller = new ItemController(service, new TemplateConfig().modelMapper());
 
         //when DELETE request is handled
-        var response = controller.deleteItem(item.getId());
+        var response = controller.deleteItem("item-a");
 
         //then OK status is returned
         assertEquals(OK, response.getStatusCode());
@@ -183,10 +269,10 @@ class ItemControllerTest {
         var service = mock(ItemService.class);
 
         //and controller
-        var controller = new ItemController(service, new ModelMapper());
+        var controller = new ItemController(service, new TemplateConfig().modelMapper());
 
         //and item id
-        var itemId = 1L;
+        var itemId = "item-a";
 
         //when DELETE request is handled
         var response = controller.deleteItem(itemId);

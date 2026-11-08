@@ -1,18 +1,16 @@
 package template.repository;
 
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.AllArgsConstructor;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import template.exception.ItemAlreadyExistsException;
 
 import java.util.List;
 import java.util.Optional;
-
-import static template.repository.Queries.ALTER_SEQUENCE_QUERY;
-import static template.repository.Queries.CURRENT_SEQ_VAL_QUERY;
-import static template.repository.Queries.LOCK_QUERY;
-import static template.repository.Queries.MERGE_QUERY;
 
 @Repository
 @AllArgsConstructor
@@ -23,7 +21,7 @@ public class ItemRepository {
 
     private final ItemJpaRepository jpaRepository;
 
-    public Optional<ItemEntity> findById(Long id) {
+    public Optional<ItemEntity> findById(String id) {
         return jpaRepository.findById(id);
     }
 
@@ -33,33 +31,20 @@ public class ItemRepository {
 
     @Transactional
     public void create(ItemEntity item) {
-        acquireH2Lock();
-        jpaRepository.save(item);
+        try {
+            entityManager.persist(item);
+            entityManager.flush();
+        } catch (EntityExistsException | ConstraintViolationException e) {
+            throw new ItemAlreadyExistsException(item.getId());
+        }
     }
 
     @Transactional
-    public void upsert(Long id, ItemEntity item) {
-        acquireH2Lock();
-        entityManager.createNativeQuery(MERGE_QUERY).setParameter(1, id).setParameter(2, item.getName()).executeUpdate();
-        syncSequence(id);
+    public void upsert(ItemEntity item) {
+        jpaRepository.save(item);
     }
 
-    private void acquireH2Lock() {
-        //solution for development and testing on H2, but it may need adjustments for production databases
-        entityManager.createNativeQuery(LOCK_QUERY).getResultList();
-    }
-
-    private void syncSequence(Long insertedId) {
-        var currentSeqVal = (Number) entityManager.createNativeQuery(CURRENT_SEQ_VAL_QUERY).getSingleResult();
-
-        if (insertedId < currentSeqVal.longValue()) {
-            return;
-        }
-
-        entityManager.createNativeQuery(String.format(ALTER_SEQUENCE_QUERY, insertedId + 1)).executeUpdate();
-    }
-
-    public void deleteById(Long id) {
+    public void deleteById(String id) {
         jpaRepository.deleteById(id);
     }
 

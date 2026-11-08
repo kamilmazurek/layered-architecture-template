@@ -7,10 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import template.api.model.ItemDTO;
 import template.service.Item;
+import template.service.ItemId;
 import template.service.ItemService;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
@@ -21,8 +23,8 @@ public class ItemController implements ItemsApi {
     private final ModelMapper mapper;
 
     @Override
-    public ResponseEntity<ItemDTO> getItem(Long id) {
-        return service.get(id).map(this::toDTO).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<ItemDTO> getItem(String id) {
+        return findItem(id).map(this::toDTO).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     @Override
@@ -42,27 +44,31 @@ public class ItemController implements ItemsApi {
 
 
     @Override
-    public ResponseEntity<Void> putItem(Long itemId, ItemDTO itemDTO) {
+    public ResponseEntity<Void> putItem(String itemId, ItemDTO itemDTO) {
         if (!hasValidId(itemId, itemDTO)) {
             return ResponseEntity.badRequest().build();
         }
 
-        service.upsert(itemId, toDomainObject(itemDTO));
+        service.upsert(toDomainObject(itemDTO));
         return ResponseEntity.ok().build();
     }
 
     @Override
-    public ResponseEntity<Void> deleteItem(Long id) {
-        if (service.get(id).isEmpty()) {
+    public ResponseEntity<Void> deleteItem(String id) {
+        if (findItem(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        service.delete(id);
+        service.delete(new ItemId(id));
         return ResponseEntity.ok().build();
     }
 
-    private boolean hasValidId(Long itemId, ItemDTO itemDTO) {
-        return itemDTO.getId() == null || Objects.equals(itemId, itemDTO.getId());
+    private Optional<Item> findItem(String id) {
+        return Optional.ofNullable(id).filter(ItemId::isValid).map(ItemId::new).flatMap(service::get);
+    }
+
+    private boolean hasValidId(String itemId, ItemDTO itemDTO) {
+        return itemDTO.getId() != null && Objects.equals(itemId, itemDTO.getId());
     }
 
     @VisibleForTesting
